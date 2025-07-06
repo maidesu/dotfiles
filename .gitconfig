@@ -1,0 +1,21 @@
+[init]
+	defaultBranch = master
+[user]
+	name = maidesu
+	email = vorpeti@gmail.com
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[alias]
+	shorttree = log --graph --simplify-by-decoration --pretty=format:'%d' --all
+	tree = log --oneline --graph --simplify-by-decoration --all
+	longtree = log --oneline --graph --decorate=full --all
+	longertree = log --graph --decorate=full --all
+	pruneremote = remote prune origin
+	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f"
+[color]
+	ui = always
+[core]
+	autocrlf = input
