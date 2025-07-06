@@ -3,6 +3,7 @@
 [user]
 	name = maidesu
 	email = vorpeti@gmail.com
+	signingkey = 6837E56FC101F550
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -19,3 +20,5 @@
 	ui = always
 [core]
 	autocrlf = input
+[commit]
+	gpgsign = true
