@@ -1,3 +1,6 @@
+alias python='python3.13'
+alias pip='pip3.13'
+
 alias cl='clear'
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias cwd2lf='find . -type f -exec dos2unix {} +'
