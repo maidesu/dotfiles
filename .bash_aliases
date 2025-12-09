@@ -1,50 +1,15 @@
-alias ll='ls -lahF'
-alias cl='clear'
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+
+alias cl='clear'
 alias cwd2lf='find . -type f -exec dos2unix {} +'
+alias ll='ls -lahF'
 
-alias gfp='function _gfp() {\
-             git fetch "$1" pull/"$2"/head:pr-"$2";\
-           };_gfp'
 
-alias ga='git add'
-alias gb='git branch'
-alias gbl='git blame'
-alias gbs='git bisect'
-alias gc='git commit -m'
-alias gca='git commit --amend --no-edit'
-alias gcf='git clean -fd'
-alias gch='git checkout'
-alias gcn='git clean -nd'
-alias gcp='git cherry-pick'
-alias gd='git diff -C --diff-algorithm=histogram'
-alias gdd='gd --no-index'
-alias gdm='gd -w'
-alias gdo='gd --stat'
-alias gds='gd --staged'
-alias gdw='gd -D --word-diff=color'
-alias gf='git fetch'
-alias gfa='git fetch --all'
-alias gl='git log'
-alias gpf='git push --force'
-alias gpl='git pull'
-alias gps='git push'
-alias gpt='git branch -f'
-alias gpw='git push --force-with-lease'
-alias gr='git reset'
-alias grb='git rebase'
-alias grh='git reset --hard'
-alias grl='git reflog'
-alias grs='git restore --staged'
-alias grt='git restore'
-alias grv='git revert'
-alias gs='git status -sb'
-alias gsc='git switch -c'
-alias gsh='git show'
-alias gst='git switch --track'
-alias gsw='git switch'
-alias gt='git log --graph --pretty=oneline --abbrev-commit --simplify-by-decoration --all'
-alias gtg='git tag'
-alias gu='git reset --soft HEAD~1'
-alias gw='git worktree'
-alias gx='git reset --hard HEAD'
+if [ -f ~/.git_functions ]; then
+    . ~/.git_functions
+fi
+
+if [ -f ~/.git_aliases ]; then
+    . ~/.git_aliases
+fi
