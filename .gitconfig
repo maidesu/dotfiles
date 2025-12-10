@@ -22,3 +22,5 @@
 	autocrlf = input
 [commit]
 	gpgsign = true
+[advice]
+	addEmptyPathspec = false
