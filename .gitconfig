@@ -20,7 +20,11 @@
 	ui = always
 [core]
 	autocrlf = input
+	attributesfile = /home/mai/.gitattributes
 [commit]
 	gpgsign = true
 [advice]
 	addEmptyPathspec = false
+[diff "xxd"]
+	textconv = xxd
+	binary = true

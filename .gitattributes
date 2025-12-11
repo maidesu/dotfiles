@@ -1,0 +1,8 @@
+*.bin diff=xxd
+*.out diff=xxd
+*.exe diff=xxd
+*.dll diff=xxd
+*.jpg diff=xxd
+*.png diff=xxd
+*.bmp diff=xxd
+*.pdf diff=xxd
