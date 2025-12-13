@@ -6,6 +6,7 @@ alias gfp='function _gfp() {\
 alias ga='git add'
 alias gb='git branch'
 alias gbl='git blame'
+alias gbr='git log --all --date-order --pretty=format:"%C(yellow)%h%C(reset) %C(auto)(%D)%C(reset) %C(dim)[%an]:%C(reset) %s" --simplify-by-decoration'
 alias gbs='git bisect'
 alias gc='git commit -m'
 alias gca='git commit --amend --no-edit'
