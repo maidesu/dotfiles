@@ -1,0 +1,61 @@
+pcm.e30 {
+    type dmix
+    ipc_key 1234
+    slave {
+        pcm "hw:2,0"
+        rate 44100
+        format S32_LE
+        channels 2
+        period_size 16
+        buffer_size 192
+    }
+}
+
+pcm.e30-safe {
+    type dmix
+    ipc_key 9696
+    slave {
+        pcm "hw:2,0"
+        rate 44100
+        format S32_LE
+        channels 2
+        period_size 256
+        buffer_size 1024
+    }
+}
+
+pcm.board {
+    type dmix
+    ipc_key 4321
+    slave {
+        pcm "hw:1,0"
+        rate 44100
+        format S32_LE
+        channels 2
+        period_size 16
+        buffer_size 64
+    }
+}
+
+pcm.board-safe {
+    type dmix
+    ipc_key 6969
+    slave {
+        pcm "hw:1,0"
+        rate 44100
+        format S32_LE
+        channels 2
+        period_size 256
+        buffer_size 1024
+    }
+}
+
+pcm.nullsink {
+    type null
+}
+
+
+pcm.!default {
+    type plug
+    slave.pcm "e30-safe"
+}
