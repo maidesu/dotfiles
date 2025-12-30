@@ -1,186 +1,367 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $EUID -ne 0 ]]; then
-    echo "Run this script as root (e.g. sudo ./postinstall.sh)" >&2
+LOG=/var/log/postinstall.log
+exec > >(tee -a "$LOG") 2>&1
+
+
+die()
+{
+    echo "ERROR: $*" >&2
     exit 1
-fi
+}
+
+require_root()
+{
+    [[ $EUID -eq 0 ]] || die "Run this script as root (e.g. sudo ./postinstall.sh)."
+}
+
+detect_os()
+{
+    CODENAME=$(awk -F= '/^VERSION_CODENAME=/{print $2}' /etc/os-release)
+    VERSION_ID=$(awk -F= '/^VERSION_ID=/{gsub(/"/,""); print $2}' /etc/os-release)
+    TRACK=$(awk 'NR==1{t="stable"; if($0 ~ /(sid|testing|\/)/) t="testing"; print t; exit}' /etc/debian_version)
+
+    echo "Codename: $CODENAME"
+    echo "VERSION_ID: $VERSION_ID"
+    echo "Track: $TRACK"
+}
+
+detect_user()
+{
+    TARGET_USER="${SUDO_USER:-}"
+    TARGET_HOME=""
+    [[ -n "$TARGET_USER" ]] || die "Run with sudo from your user (so SUDO_USER is set)."
+    TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+    [[ -n "$TARGET_HOME" && -d "$TARGET_HOME" ]] || die "Could not resolve home for $TARGET_USER"
+}
+
+run_as_user()
+{
+    sudo -u "$TARGET_USER" -H bash -lc "$*"
+}
 
 
-# ============================================================
-# OS detection
-# ============================================================
-echo "=== Detecting Debian codename ==="
-CODENAME=$(awk -F= '/^VERSION_CODENAME=/{print $2}' /etc/os-release)
-VERSION_ID=$(awk -F= '/^VERSION_ID=/{gsub(/"/,""); print $2}' /etc/os-release)
-echo "Codename: $CODENAME"
-echo "VERSION_ID: $VERSION_ID"
+step_apt_sources()
+{
+    if [[ "$TRACK" == "testing" ]]; then
+        DEB_SOURCE="testing"
+        SEC_SOURCE="testing-security"
+        UPD_SOURCE="testing-updates"
+    else
+        DEB_SOURCE="$CODENAME"
+        SEC_SOURCE="${CODENAME}-security"
+        UPD_SOURCE="${CODENAME}-updates"
+    fi
 
-
-# ============================================================
-# APT sources
-# ============================================================
-echo "=== Configuring APT sources (main + contrib + non-free + non-free-firmware) ==="
-cat >/etc/apt/sources.list <<EOF
-deb http://deb.debian.org/debian $CODENAME main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian-security $CODENAME-security main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian $CODENAME-updates main contrib non-free non-free-firmware
+    cat >/etc/apt/sources.list <<EOF
+deb http://deb.debian.org/debian $DEB_SOURCE main contrib non-free non-free-firmware
+deb http://security.debian.org/debian-security $SEC_SOURCE main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian $UPD_SOURCE main contrib non-free non-free-firmware
 EOF
 
-apt update
+    apt update
+    apt -y full-upgrade
+}
 
+step_nvidia_sources()
+{
+    apt install -y ca-certificates gnupg wget
 
-# ============================================================
-# Packages
-# ============================================================
-echo "=== Installing packages ==="
-apt install -y \
-    firmware-misc-nonfree \
-    firmware-realtek \
-    linux-headers-$(uname -r) \
-    build-essential \
-    cmake \
-    dkms \
-    mokutil \
-    openssl \
-    ca-certificates gnupg \
-    wget curl git \
-    mesa-utils \
-    llvm \
-    vim \
-    htop \
-    ethtool \
-    notepadqq \
-    chromium
+    # NVIDIA publishes Debian repos under debian12/debian13 naming.
+    case "$VERSION_ID" in
+        12) NVIDIA_DEB="debian12" ;;
+        13) NVIDIA_DEB="debian13" ;;
+        *) die "Unsupported Debian VERSION_ID=$VERSION_ID for automatic NVIDIA repo setup." ;;
+    esac
 
+    CUDA_KEYRING_DEB="cuda-keyring_1.1-1_all.deb"
+    CUDA_KEYRING_URL="https://developer.download.nvidia.com/compute/cuda/repos/${NVIDIA_DEB}/x86_64/${CUDA_KEYRING_DEB}"
 
-# ============================================================
-# NVIDIA repo setup
-# ============================================================
-echo "=== Add NVIDIA repo keyring ==="
-# NVIDIA publishes Debian repos under debian12/debian13 naming.
-case "$VERSION_ID" in
-    12) NVIDIA_DEB="debian12" ;;
-    13) NVIDIA_DEB="debian13" ;;
-    *)
-        echo "Unsupported Debian VERSION_ID=$VERSION_ID for automatic NVIDIA repo setup." >&2
-        echo "Install a newer driver via your preferred method (NVIDIA repo / backports / sid)." >&2
-        exit 1
-        ;;
-esac
+    wget -q "$CUDA_KEYRING_URL" -O "/tmp/${CUDA_KEYRING_DEB}"
+    dpkg -i "/tmp/${CUDA_KEYRING_DEB}"
+    apt -f install -y
+    apt update
+}
 
-CUDA_KEYRING_DEB="cuda-keyring_1.1-1_all.deb"
-CUDA_KEYRING_URL="https://developer.download.nvidia.com/compute/cuda/repos/${NVIDIA_DEB}/x86_64/${CUDA_KEYRING_DEB}"
+step_base_packages()
+{
+    apt install -y linux-headers-amd64
+    apt install -y "linux-headers-$(uname -r)" || true
 
-wget -q "$CUDA_KEYRING_URL" -O "/tmp/${CUDA_KEYRING_DEB}"
-dpkg -i "/tmp/${CUDA_KEYRING_DEB}"
-apt -f install -y
-apt update
+    apt install -y \
+        firmware-misc-nonfree \
+        firmware-realtek \
+        build-essential \
+        cmake \
+        pkg-config \
+        ninja-build \
+        meson \
+        clang \
+        clangd \
+        lldb \
+        gdb \
+        openssl \
+        curl \
+        mesa-utils \
+        llvm \
+        vim \
+        htop \
+        ethtool \
+        dos2unix \
+        nftables \
+        jq \
+        ripgrep \
+        dnsutils \
+        traceroute \
+        iproute2 \
+        apt-file \
+        apt-utils
 
+#    apt install -y intel-microcode || true
+    apt install -y amd64-microcode || true
+}
 
-# ============================================================
-# Realtek RTL8125: prefer r8125 over r8169
-# ============================================================
-echo "=== Install r8125-dkms ==="
-apt install -y r8125-dkms
+step_r8125()
+{
+    apt install -y dkms mokutil
+    apt install -y r8125-dkms
 
+    /usr/sbin/dkms autoinstall -k "$(uname -r)" || die "DKMS install failed."
+    /usr/sbin/dkms status || true
 
-# ============================================================
-# NVIDIA driver install
-# ============================================================
-echo "=== NVIDIA driver (Open kernel modules) ==="
-apt install -y nvidia-open
-
-
-# ============================================================
-# Kernel module configuration
-# ============================================================
-echo "=== Blacklist r8169 ==="
-cat >/etc/modprobe.d/blacklist-r8169.conf <<'EOF'
+    cat >/etc/modprobe.d/blacklist-r8169.conf <<'EOF'
 blacklist r8169
 EOF
+}
 
-echo "=== Blacklist nouveau (avoid binding the GPU) ==="
-cat >/etc/modprobe.d/blacklist-nouveau.conf <<'EOF'
-blacklist nouveau
-options nouveau modeset=0
-EOF
+step_nvidia_driver()
+{
+    apt install -y dkms mokutil
 
-echo "=== Force nvidia-drm KMS (modeset=1) ==="
-cat >/etc/modprobe.d/nvidia-kms.conf <<'EOF'
+    cat >/etc/modprobe.d/nvidia-kms.conf <<'EOF'
 options nvidia-drm modeset=1
 EOF
 
+    apt install -y nvidia-open
 
-# ============================================================
-# Disable Wake-on-LAN persistently (systemd .link)
-#
-# This prevents the NIC staying partially powered in S5 for WoL,
-# which is what caused the dual-boot "NIC vanishes from lspci" state.
-# ============================================================
-echo "=== Disable Wake-on-LAN persistently via systemd .link ==="
+    /usr/sbin/dkms autoinstall -k "$(uname -r)" || die "DKMS install failed."
+    /usr/sbin/dkms status || true
 
-install -d -m 0755 /etc/systemd/network
+    cat >/etc/modprobe.d/blacklist-nouveau.conf <<'EOF'
+blacklist nouveau
+options nouveau modeset=0
+EOF
+}
 
-cat >/etc/systemd/network/10-disable-wol.link <<'EOF'
+step_disable_wol()
+{
+    install -d -m 0755 /etc/systemd/network
+
+    cat >/etc/systemd/network/10-disable-wol.link <<'EOF'
 [Match]
 Type=ether
 
 [Link]
 WakeOnLan=no
 EOF
+}
 
-# Reload udev rules immediately; link file will apply on next reboot.
-udevadm control --reload
-udevadm trigger --subsystem-match=net || true
+step_disable_os_prober()
+{
+    apt purge -y os-prober || true
+    install -d -m 0755 /etc/default/grub.d
+    cat >/etc/default/grub.d/01-disable-os-prober.cfg <<'EOF'
+GRUB_DISABLE_OS_PROBER=true
+EOF
+}
 
-
-# ============================================================
-# DKMS + Secure Boot MOK
-# ============================================================
-echo "=== Ensure DKMS builds modules for current kernel ==="
-/usr/sbin/dkms autoinstall -k "$(uname -r)" || true
-/usr/sbin/dkms status || true
-
-echo "=== Rebuild initramfs for module configuration changes ==="
-update-initramfs -u
-
-echo "=== Import DKMS-generated MOK for Secure Boot ==="
-if [[ -f /var/lib/dkms/mok.pub ]]; then
-    echo "Found /var/lib/dkms/mok.pub, importing with mokutil..."
-    mokutil --import /var/lib/dkms/mok.pub || {
-        echo "mokutil import failed or is already imported."
-    }
-    echo
-    echo ">>> On next reboot you MUST use the blue MOK manager screen to 'Enroll MOK'"
-    echo ">>> and enter the password you set when mokutil prompted you."
-    echo
-else
-    echo "No /var/lib/dkms/mok.pub found."
-fi
-
-
-# ============================================================
-# Set display manager
-# ============================================================
-echo "=== Force GDM to use Xorg (WaylandEnable=false) ==="
-if [[ -f /etc/gdm3/daemon.conf ]]; then
-    if grep -q '^#WaylandEnable=false' /etc/gdm3/daemon.conf; then
-        sed -i 's/^#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/daemon.conf
-    elif ! grep -q '^WaylandEnable=' /etc/gdm3/daemon.conf; then
-        sed -i '/^\[daemon\]/a WaylandEnable=false' /etc/gdm3/daemon.conf
+step_disable_wayland()
+{
+    if [[ -f /etc/gdm3/daemon.conf ]]; then
+        if grep -q '^#WaylandEnable=false' /etc/gdm3/daemon.conf; then
+            sed -i 's/^#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/daemon.conf
+        elif ! grep -q '^WaylandEnable=' /etc/gdm3/daemon.conf; then
+            sed -i '/^\[daemon\]/a WaylandEnable=false' /etc/gdm3/daemon.conf
+        fi
     fi
-fi
+}
+
+step_mok_pub()
+{
+    if [[ -f /var/lib/dkms/mok.pub ]]; then
+        echo "Found /var/lib/dkms/mok.pub, importing with mokutil..."
+        mokutil --import /var/lib/dkms/mok.pub || {
+            echo "mokutil import failed or is already imported."
+        }
+        echo "On next reboot: 'Enroll MOK'"
+    else
+        echo "No /var/lib/dkms/mok.pub found."
+    fi
+}
+
+step_python()
+{
+#    apt install -y libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev libnss3-dev uuid-dev
+#    pyenv install 3.9.25
+#    pyenv install 3.10.19
+#    pyenv install 3.11.14
+#    pyenv install 3.12.12
+#    pyenv install 3.13.11
+#    #set 3.13.11 default pyenv
+#    curl -sSL https://install.python-poetry.org | python -
+}
+
+step_docker()
+{
+    apt install -y ca-certificates curl gnupg
+    install -m 0755 -d /etc/apt/keyrings
+
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+
+    cat >/etc/apt/sources.list.d/docker.list <<EOF
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable
+EOF
+
+    apt update
+    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    systemctl enable --now docker || true
+
+    groupadd docker 2>/dev/null || true
+    usermod -aG docker "$TARGET_USER" || true
+}
+
+step_app_packages()
+{
+    apt install -y \
+        fastfetch \
+        nvidia-cuda-toolkit \
+        alsa-utils \
+        alsa-tools \
+        ffmpeg \
+        mpv \
+        yt-dlp \
+#        flameshot \ # maybe already done on latest gnome with wayland
+        baobab \
+        gimp \
+        notepadqq \
+        chromium
+}
+
+step_deb_packages()
+{
+    apt install -y ca-certificates curl
+
+    # Discord
+    local discord_url="https://discord.com/api/download?platform=linux&format=deb"
+    local discord_deb="/tmp/discord.deb"
+    curl -fL --retry 3 --retry-delay 1 "$discord_url" -o "$discord_deb"
+    apt install -y "$discord_deb"
+    rm -f "$discord_deb"
+
+    # Chatterino
+    local chatterino_url=""
+    local chatterino_install="1"
+    case "$VERSION_ID" in
+        12) chatterino_url="https://github.com/Chatterino/chatterino2/releases/download/v2.5.4/Chatterino-Ubuntu-22.04.deb" ;;
+        13) chatterino_url="https://github.com/Chatterino/chatterino2/releases/download/v2.5.4/Chatterino-Ubuntu-24.04.deb" ;;
+        *)
+            echo "Skipping Chatterino: VERSION_ID=$VERSION_ID" >&2
+            chatterino_install="0"
+            ;;
+    esac
+
+    if [[ "$chatterino_install" == "1" ]]; then
+        local chatterino_deb="/tmp/chatterino.deb"
+        curl -fL --retry 3 --retry-delay 1 "$chatterino_url" -o "$chatterino_deb"
+        apt install -y "$chatterino_deb"
+        rm -f "$chatterino_deb"
+    fi
+
+    # Steam
+    local steam_url="https://cdn.fastly.steamstatic.com/client/installer/steam.deb"
+    local steam_deb="/tmp/steam.deb"
+    curl -fL --retry 3 --retry-delay 1 "$steam_url" -o "$steam_deb"
+    apt install -y "$steam_deb"
+    rm -f "$steam_deb"
+}
+
+step_appimages()
+{
+    apt install -y ca-certificates curl
+
+    local bin_dir="/usr/local/bin"
+    local opt_dir="/opt"
+
+    # osu!
+    local osu_url="https://github.com/ppy/osu/releases/latest/download/osu.AppImage"
+    local osu_tmpdir
+    osu_tmpdir="$(mktemp -d)"
+    local osu_appimage="$osu_tmpdir/osu.AppImage"
+    local osu_optdir="$opt_dir/osu"
+    local osu_wrapper="$bin_dir/osu"
+
+    curl -fL --retry 3 --retry-delay 1 "$osu_url" -o "$osu_appimage"
+    chmod +x "$osu_appimage"
+
+    ( cd "$osu_tmpdir" && ./osu.AppImage --appimage-extract >/dev/null )
+
+    rm -rf "$osu_optdir"
+    mv "$osu_tmpdir/squashfs-root" "$osu_optdir"
+    chmod +x "$osu_optdir/AppRun"
+
+    cat >"$osu_wrapper" <<'EOF'
+#!/usr/bin/env bash
+exec /opt/osu/AppRun "$@"
+EOF
+    chmod 0755 "$osu_wrapper"
+
+    rm -rf "$osu_tmpdir"
+}
+
+finalize()
+{
+    systemctl daemon-reload || true
+
+    udevadm control --reload || true
+    udevadm trigger || true
+    udevadm trigger --subsystem-match=net || true
+
+    depmod -a || true
+
+    update-initramfs -u -k all
+
+    update-grub
+}
 
 
-echo "=== Summary / Next steps ==="
-echo "1) Reboot."
-echo "2) On the blue MOK screen, choose 'Enroll MOK' and complete it (for DKMS/NVIDIA)."
-echo "3) Back in Debian, verify:"
-echo "   - mokutil --sb-state  (SecureBoot enabled)"
-echo "   - nvidia-smi          (driver loaded)"
-echo "4) Check disks with df -h to confirm your new partition layout is sane."
-echo "5) If video broken, check:"
-echo "   - dmesg -T | egrep -i 'NVRM|nvidia|secure|lockdown|key' | tail -200"
-echo
-echo "Script finished."
+main()
+{
+    require_root
+    detect_os
+    detect_user
+
+    step_apt_sources
+    step_nvidia_sources
+
+    step_base_packages
+
+    step_disable_os_prober
+    step_disable_wol
+
+    step_nvidia_driver
+    step_mok_pub
+
+    step_python
+    step_docker
+
+    step_app_packages
+    step_deb_packages
+    step_appimages
+
+    finalize
+}
+
+main "$@"
