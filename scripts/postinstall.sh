@@ -22,6 +22,11 @@ detect_os()
     VERSION_ID=$(awk -F= '/^VERSION_ID=/{gsub(/"/,""); print $2}' /etc/os-release)
     TRACK=$(awk 'NR==1{t="stable"; if($0 ~ /(sid|testing|\/)/) t="testing"; print t; exit}' /etc/debian_version)
 
+    # Workaround: testing does not set this
+    if [[ -z "$VERSION_ID" ]]; then
+        VERSION_ID="13"
+    fi
+
     echo "Codename: $CODENAME"
     echo "VERSION_ID: $VERSION_ID"
     echo "Track: $TRACK"
@@ -61,7 +66,7 @@ deb http://deb.debian.org/debian $UPD_SOURCE main contrib non-free non-free-firm
 EOF
 
     apt update
-    apt -y full-upgrade
+    apt -y full-upgrade --auto-remove
 }
 
 step_nvidia_sources()
@@ -152,6 +157,8 @@ EOF
 blacklist nouveau
 options nouveau modeset=0
 EOF
+
+    apt full-upgrade -y --auto-remove
 }
 
 step_disable_wol()
@@ -167,15 +174,6 @@ WakeOnLan=no
 EOF
 }
 
-step_disable_os_prober()
-{
-    apt purge -y os-prober || true
-    install -d -m 0755 /etc/default/grub.d
-    cat >/etc/default/grub.d/01-disable-os-prober.cfg <<'EOF'
-GRUB_DISABLE_OS_PROBER=true
-EOF
-}
-
 step_disable_wayland()
 {
     if [[ -f /etc/gdm3/daemon.conf ]]; then
@@ -185,6 +183,17 @@ step_disable_wayland()
             sed -i '/^\[daemon\]/a WaylandEnable=false' /etc/gdm3/daemon.conf
         fi
     fi
+}
+
+step_skip_grub()
+{
+    apt purge -y os-prober || true
+    install -d -m 0755 /etc/default/grub.d
+    cat >/etc/default/grub.d/01-skip-other-os.cfg <<'EOF'
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISABLE_OS_PROBER=true
+EOF
 }
 
 step_mok_pub()
@@ -214,6 +223,11 @@ step_python()
 
 step_docker()
 {
+    local docker_codename="$CODENAME"
+    case "$docker_codename" in
+        forky|duke) docker_codename="trixie" ;;  # Workaround: docker codename is behind
+    esac
+
     apt install -y ca-certificates curl gnupg
     install -m 0755 -d /etc/apt/keyrings
 
@@ -221,7 +235,7 @@ step_docker()
     chmod a+r /etc/apt/keyrings/docker.gpg
 
     cat >/etc/apt/sources.list.d/docker.list <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $docker_codename stable
 EOF
 
     apt update
@@ -243,11 +257,11 @@ step_app_packages()
         ffmpeg \
         mpv \
         yt-dlp \
-#        flameshot \ # maybe already done on latest gnome with wayland
         baobab \
         gimp \
         notepadqq \
         chromium
+#        flameshot # maybe already done on latest gnome with wayland
 }
 
 step_deb_packages()
@@ -260,25 +274,6 @@ step_deb_packages()
     curl -fL --retry 3 --retry-delay 1 "$discord_url" -o "$discord_deb"
     apt install -y "$discord_deb"
     rm -f "$discord_deb"
-
-    # Chatterino
-    local chatterino_url=""
-    local chatterino_install="1"
-    case "$VERSION_ID" in
-        12) chatterino_url="https://github.com/Chatterino/chatterino2/releases/download/v2.5.4/Chatterino-Ubuntu-22.04.deb" ;;
-        13) chatterino_url="https://github.com/Chatterino/chatterino2/releases/download/v2.5.4/Chatterino-Ubuntu-24.04.deb" ;;
-        *)
-            echo "Skipping Chatterino: VERSION_ID=$VERSION_ID" >&2
-            chatterino_install="0"
-            ;;
-    esac
-
-    if [[ "$chatterino_install" == "1" ]]; then
-        local chatterino_deb="/tmp/chatterino.deb"
-        curl -fL --retry 3 --retry-delay 1 "$chatterino_url" -o "$chatterino_deb"
-        apt install -y "$chatterino_deb"
-        rm -f "$chatterino_deb"
-    fi
 
     # Steam
     local steam_url="https://cdn.fastly.steamstatic.com/client/installer/steam.deb"
@@ -294,6 +289,32 @@ step_appimages()
 
     local bin_dir="/usr/local/bin"
     local opt_dir="/opt"
+
+    # Chatterino
+    local chatterino_url="https://chatterino.fra1.digitaloceanspaces.com/bin/2.5.4/Chatterino-x86_64.AppImage"
+    local chatterino_tmpdir
+    chatterino_tmpdir="$(mktemp -d)"
+    local chatterino_appimage="$chatterino_tmpdir/chatterino.AppImage"
+    local chatterino_optdir="$opt_dir/chatterino"
+    local chatterino_wrapper="$bin_dir/chatterino"
+
+    curl -fL --retry 3 --retry-delay 1 "$chatterino_url" -o "$chatterino_appimage"
+    chmod +x "$chatterino_appimage"
+
+    ( cd "$chatterino_tmpdir" && ./chatterino.AppImage --appimage-extract >/dev/null )
+
+    rm -rf "$chatterino_optdir"
+    mv "$chatterino_tmpdir/squashfs-root" "$chatterino_optdir"
+    chmod +x "$chatterino_optdir/AppRun"
+
+    cat >"$chatterino_wrapper" <<'EOF'
+#!/usr/bin/env bash
+exec /opt/chatterino/AppRun "$@"
+EOF
+    chmod 0755 "$chatterino_wrapper"
+
+    rm -rf "$chatterino_tmpdir"
+
 
     # osu!
     local osu_url="https://github.com/ppy/osu/releases/latest/download/osu.AppImage"
@@ -348,8 +369,9 @@ main()
 
     step_base_packages
 
-    step_disable_os_prober
     step_disable_wol
+
+    step_skip_grub
 
     step_nvidia_driver
     step_mok_pub
