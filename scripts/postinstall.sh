@@ -332,6 +332,10 @@ step_app_packages()
         notepadqq \
         chromium
 #        flameshot # maybe already done on latest gnome with wayland
+
+    dpkg --add-architecture i386 || true
+    apt update
+    apt install -y steam-installer steam-devices
 }
 
 step_deb_packages()
@@ -344,13 +348,6 @@ step_deb_packages()
     curl -fL --retry 3 --retry-delay 1 "$discord_url" -o "$discord_deb"
     apt install -y "$discord_deb"
     rm -f "$discord_deb"
-
-    # Steam
-    local steam_url="https://cdn.fastly.steamstatic.com/client/installer/steam.deb"
-    local steam_deb="/tmp/steam.deb"
-    curl -fL --retry 3 --retry-delay 1 "$steam_url" -o "$steam_deb"
-    apt install -y "$steam_deb"
-    rm -f "$steam_deb"
 }
 
 step_appimages()
@@ -439,7 +436,10 @@ main()
 
     step_base_packages
 
+    #step_r8125
     step_disable_wol
+
+    #step_disable_wayland
 
     step_skip_grub
 
