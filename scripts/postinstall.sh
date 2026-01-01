@@ -20,16 +20,18 @@ detect_os()
 {
     CODENAME=$(awk -F= '/^VERSION_CODENAME=/{print $2}' /etc/os-release)
     VERSION_ID=$(awk -F= '/^VERSION_ID=/{gsub(/"/,""); print $2}' /etc/os-release)
-    TRACK=$(awk 'NR==1{t="stable"; if($0 ~ /(sid|testing|\/)/) t="testing"; print t; exit}' /etc/debian_version)
 
     # Workaround: testing does not set this
     if [[ -z "$VERSION_ID" ]]; then
-        VERSION_ID="13"
+        case "$CODENAME" in
+            forky) VERSION_ID="14" ;;
+            duke) VERSION_ID="15" ;;
+            *) die "VERSION_ID is not set properly." ;;
+        esac
     fi
 
     echo "Codename: $CODENAME"
     echo "VERSION_ID: $VERSION_ID"
-    echo "Track: $TRACK"
 }
 
 detect_user()
@@ -49,20 +51,21 @@ run_as_user()
 
 step_apt_sources()
 {
-    if [[ "$TRACK" == "testing" ]]; then
-        DEB_SOURCE="testing"
-        SEC_SOURCE="testing-security"
-        UPD_SOURCE="testing-updates"
-    else
-        DEB_SOURCE="$CODENAME"
-        SEC_SOURCE="${CODENAME}-security"
-        UPD_SOURCE="${CODENAME}-updates"
-    fi
+    mv -f /etc/apt/sources.list /etc/apt/sources.list.bak || true
+    touch /etc/apt/sources.list~
 
-    cat >/etc/apt/sources.list <<EOF
-deb http://deb.debian.org/debian $DEB_SOURCE main contrib non-free non-free-firmware
-deb http://security.debian.org/debian-security $SEC_SOURCE main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian $UPD_SOURCE main contrib non-free non-free-firmware
+    cat >/etc/apt/sources.list.d/debian.sources <<EOF
+Types: deb deb-src
+URIs: http://deb.debian.org/debian/
+Suites: $CODENAME ${CODENAME}-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb deb-src
+URIs: http://security.debian.org/debian-security/
+Suites: ${CODENAME}-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
 
     apt update
@@ -77,6 +80,7 @@ step_nvidia_sources()
     case "$VERSION_ID" in
         12) NVIDIA_DEB="debian12" ;;
         13) NVIDIA_DEB="debian13" ;;
+        14) NVIDIA_DEB="debian13" ;;  # Workaround nvidia is slow
         *) die "Unsupported Debian VERSION_ID=$VERSION_ID for automatic NVIDIA repo setup." ;;
     esac
 
@@ -211,14 +215,7 @@ step_mok_pub()
 
 step_python()
 {
-#    apt install -y libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libgdbm-dev libnss3-dev uuid-dev
-#    pyenv install 3.9.25
-#    pyenv install 3.10.19
-#    pyenv install 3.11.14
-#    pyenv install 3.12.12
-#    pyenv install 3.13.11
-#    #set 3.13.11 default pyenv
-#    curl -sSL https://install.python-poetry.org | python -
+    return
 }
 
 step_docker()
