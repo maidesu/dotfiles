@@ -335,7 +335,7 @@ step_app_packages()
 
     dpkg --add-architecture i386 || true
     apt update
-    apt install -y steam-installer steam-devices
+    apt install -y nvidia-driver-libs:i386 steam-installer steam-devices
 }
 
 step_deb_packages()
