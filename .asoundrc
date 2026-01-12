@@ -2,7 +2,7 @@ pcm.e30 {
     type dmix
     ipc_key 1234
     slave {
-        pcm "hw:2,0"
+        pcm "hw:CARD=E30,DEV=0"
         rate 44100
         format S32_LE
         channels 2
@@ -15,7 +15,7 @@ pcm.e30-safe {
     type dmix
     ipc_key 9696
     slave {
-        pcm "hw:2,0"
+        pcm "hw:CARD=E30,DEV=0"
         rate 44100
         format S32_LE
         channels 2
@@ -28,7 +28,7 @@ pcm.board {
     type dmix
     ipc_key 4321
     slave {
-        pcm "hw:1,0"
+        pcm "hw:CARD=Generic,DEV=0"
         rate 44100
         format S32_LE
         channels 2
@@ -41,7 +41,7 @@ pcm.board-safe {
     type dmix
     ipc_key 6969
     slave {
-        pcm "hw:1,0"
+        pcm "hw:CARD=Generic,DEV=0"
         rate 44100
         format S32_LE
         channels 2
@@ -57,5 +57,10 @@ pcm.nullsink {
 
 pcm.!default {
     type plug
-    slave.pcm "e30-safe"
+    slave.pcm "board"
+}
+
+ctl.!default {
+    type hw
+    card "Generic"
 }

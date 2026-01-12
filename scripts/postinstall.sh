@@ -165,6 +165,11 @@ EOF
     apt full-upgrade -y --auto-remove
 }
 
+step_i3()
+{
+    apt install i3-wm i3status i3lock xorg xserver-xorg xterm xinput
+}
+
 step_disable_wol()
 {
     install -d -m 0755 /etc/systemd/network
@@ -409,6 +414,32 @@ EOF
     rm -rf "$osu_tmpdir"
 }
 
+step_osu_game()
+{
+    apt install -y gamemode
+
+    if getent group gamemode >/dev/null; then
+        usermod -aG gamemode "$TARGET_USER"
+    fi
+
+    run_as_user 'mkdir -p "$HOME/.local/bin"
+
+cat >"$HOME/.local/bin/osu2" <<'"'"'EOF'"'"'
+#!/usr/bin/env bash
+export __GL_SYNC_TO_VBLANK=0
+export __GL_GSYNC_ALLOWED=0
+export __GL_VRR_ALLOWED=0
+export __GL_MaxFramesAllowed=1
+export __GL_YIELD="USLEEP"
+export SDL_VIDEODRIVER=x11
+
+exec gamemoderun osu "$@"
+EOF
+
+chmod 0755 "$HOME/.local/bin/osu2"
+'
+}
+
 finalize()
 {
     systemctl daemon-reload || true
@@ -452,6 +483,8 @@ main()
     step_app_packages
     step_deb_packages
     step_appimages
+
+    step_osu_game
 
     finalize
 }
