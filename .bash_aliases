@@ -9,8 +9,7 @@ alias ll='ls -lahF'
 as_off()
 {
     systemctl --user stop pipewire-pulse.service pipewire-pulse.socket pipewire.service pipewire.socket wireplumber.service 2>/dev/null || true
-    systemctl --user mask --now pipewire-pulse.service pipewire-pulse.socket pipewire.service pipewire.socket wireplumber.service 2>/dev/null || true
-    systemctl --user mask --now wireplumber@.service 2>/dev/null || true
+    systemctl --user mask --now pipewire-pulse.service pipewire-pulse.socket pipewire.service pipewire.socket wireplumber.service wireplumber@.service 2>/dev/null || true
 }
 
 as_on()
