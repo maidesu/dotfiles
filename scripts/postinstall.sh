@@ -433,7 +433,7 @@ export __GL_MaxFramesAllowed=1
 export __GL_YIELD="USLEEP"
 export SDL_VIDEODRIVER=x11
 
-exec gamemoderun osu "$@"
+exec gamemoderun osu "$@" >/dev/null 2>&1
 EOF
 
 chmod 0755 "$HOME/.local/bin/osu2"
