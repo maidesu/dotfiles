@@ -37,6 +37,19 @@ pcm.board {
     }
 }
 
+pcm.board-cs2 {
+    type dmix
+    ipc_key 5555
+    slave {
+        pcm "hw:CARD=Generic,DEV=0"
+        rate 44100
+        format S32_LE
+        channels 2
+        period_size 128
+        buffer_size 384
+    }
+}
+
 pcm.board-safe {
     type dmix
     ipc_key 6969
@@ -57,7 +70,7 @@ pcm.nullsink {
 
 pcm.!default {
     type plug
-    slave.pcm "board"
+    slave.pcm "board-safe"
 }
 
 ctl.!default {
