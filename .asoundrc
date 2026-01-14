@@ -1,79 +1,88 @@
-pcm.e30 {
-    type dmix
-    ipc_key 1234
-    slave {
-        pcm "hw:CARD=E30,DEV=0"
-        rate 44100
-        format S32_LE
-        channels 2
-        period_size 16
-        buffer_size 192
-    }
+pcm_slave.e30-osu {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 16
+    buffer_size 192
+}
+pcm_slave.e30-safe {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 256
+    buffer_size 1024
 }
 
-pcm.e30-safe {
-    type dmix
-    ipc_key 9696
-    slave {
-        pcm "hw:CARD=E30,DEV=0"
-        rate 44100
-        format S32_LE
-        channels 2
-        period_size 256
-        buffer_size 1024
-    }
+pcm_slave.board-osu {
+    pcm "hw:CARD=Generic,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 16
+    buffer_size 64
+}
+pcm_slave.board-cs2 {
+    pcm "hw:CARD=Generic,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 128
+    buffer_size 384
+}
+pcm_slave.board-safe {
+    pcm "hw:CARD=Generic,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 256
+    buffer_size 1024
 }
 
-pcm.board {
-    type dmix
-    ipc_key 4321
-    slave {
-        pcm "hw:CARD=Generic,DEV=0"
-        rate 44100
-        format S32_LE
-        channels 2
-        period_size 16
-        buffer_size 64
-    }
-}
-
-pcm.board-cs2 {
-    type dmix
-    ipc_key 5555
-    slave {
-        pcm "hw:CARD=Generic,DEV=0"
-        rate 44100
-        format S32_LE
-        channels 2
-        period_size 128
-        buffer_size 384
-    }
-}
-
-pcm.board-safe {
-    type dmix
-    ipc_key 6969
-    slave {
-        pcm "hw:CARD=Generic,DEV=0"
-        rate 44100
-        format S32_LE
-        channels 2
-        period_size 256
-        buffer_size 1024
-    }
-}
 
 pcm.nullsink {
     type null
 }
 
 
+pcm.hw_e30 {
+    type hw
+    card E30
+    device 0
+    nonblock false
+    rate 44100
+    format S32_LE
+    channels 2
+}
+
+pcm.hw_board {
+    type hw
+    card Generic
+    device 0
+    nonblock false
+    rate 44100
+    format S32_LE
+    channels 2
+}
+
+
 pcm.!default {
-    type plug
-    slave.pcm "board-safe"
+    #type dmix
+    #ipc_key 6969
+    #slave board-osu
+
+    type empty
+    slave.pcm hw_board
+
+    #type empty
+    #slave.pcm pcm.nullsink
 }
 
 ctl.!default {
     type hw
-    card "Generic"
+    card Generic
+
+    #type hw
+    #card E30
 }
