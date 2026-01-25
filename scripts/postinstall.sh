@@ -322,6 +322,26 @@ EOF
     usermod -aG docker "$TARGET_USER" || true
 }
 
+step_vscodium()
+{
+    apt install -y ca-certificates curl gnupg
+
+    # Keyring
+    local keyring="/usr/share/keyrings/vscodium-archive-keyring.gpg"
+    local key_url="https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg"
+
+    curl -fsSL "$key_url" | gpg --dearmor -o "$keyring"
+    chmod 0644 "$keyring"
+
+    # Source list
+    cat >/etc/apt/sources.list.d/vscodium.list <<'EOF'
+deb [signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main
+EOF
+
+    apt update
+    apt install -y codium
+}
+
 step_app_packages()
 {
     apt install -y \
@@ -479,6 +499,8 @@ main()
 
     step_python
     step_docker
+
+    step_vscodium
 
     step_app_packages
     step_deb_packages
