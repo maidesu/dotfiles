@@ -6,6 +6,12 @@ alias cwd2lf='find . -type f -exec dos2unix {} +'
 alias ll='ls -lahF'
 
 
+sil()
+{
+    "$@" >/dev/null 2>&1 &
+    disown
+}
+
 as_off()
 {
     systemctl --user stop pipewire-pulse.service pipewire-pulse.socket pipewire.service pipewire.socket wireplumber.service 2>/dev/null || true
