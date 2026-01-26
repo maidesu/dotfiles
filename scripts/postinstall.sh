@@ -167,7 +167,7 @@ EOF
 
 step_i3()
 {
-    apt install i3-wm i3status i3lock xorg xserver-xorg xterm xinput
+    apt install i3-wm i3status i3lock xorg xserver-xorg xterm xinput feh
 }
 
 step_disable_wol()
