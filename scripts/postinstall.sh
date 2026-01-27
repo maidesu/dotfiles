@@ -218,6 +218,17 @@ step_mok_pub()
     fi
 }
 
+step_bash_functions()
+{
+    run_as_user 'grep -q "### BASH FUNCTIONS ###" "$HOME/.bashrc" 2>/dev/null || cat >>"$HOME/.bashrc" <<'"'"'EOF'"'"'
+### BASH FUNCTIONS ###
+if [ -f ~/.bash_functions ]; then
+    . ~/.bash_functions
+fi
+### /BASH FUNCTIONS ###
+EOF'
+}
+
 step_python()
 {
     # Build deps for compiling CPython via pyenv
@@ -496,6 +507,8 @@ main()
 
     step_nvidia_driver
     step_mok_pub
+
+    step_bash_functions
 
     step_python
     step_docker
