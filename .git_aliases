@@ -1,8 +1,3 @@
-alias gfp='function _gfp() {\
-             git fetch "$1" pull/"$2"/head:pr-"$2";\
-           };_gfp'
-
-
 alias ga='git add'
 alias gb='git branch'
 alias gbl='git blame'
