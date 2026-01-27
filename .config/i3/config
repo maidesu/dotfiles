@@ -189,10 +189,12 @@ bar {
         status_command i3status
 }
 
+# Nvidia settings
+exec_always --no-startup-id sh -c 'nvidia-settings --load-config-only || true'
 
-exec --no-startup-id sh -c 'nvidia-settings --load-config-only || true'
-
-exec --no-startup-id ~/.config/i3/peripherals.sh
+# Peripherals
+exec_always --no-startup-id ~/.config/i3/peripherals.sh
 #exec --no-startup-id sh -c '~/.config/i3/peripherals.sh >> "$HOME/i3-peripherals.log" 2>&1'
 
+# Wallpapers
 exec_always --no-startup-id feh --bg-fill --randomize ~/Downloads/desktopwallpaper/*
