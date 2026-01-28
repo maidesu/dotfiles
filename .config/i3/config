@@ -189,6 +189,10 @@ bar {
         status_command i3status
 }
 
+
+# Screenshot
+bindsym $mod+Shift+s exec --no-startup-id sh -c 'dir="$HOME/Pictures" && f="$dir/shot-$(date +%F_%H-%M-%S).png" && maim -s "$f" && xclip -selection clipboard -t image/png -i "$f"'
+
 # Nvidia settings
 exec_always --no-startup-id sh -c 'nvidia-settings --load-config-only || true'
 

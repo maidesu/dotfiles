@@ -366,8 +366,10 @@ step_app_packages()
         baobab \
         gimp \
         notepadqq \
-        chromium
-#        flameshot # maybe already done on latest gnome with wayland
+        chromium \
+        maim \
+        slop \
+        xclip
 
     dpkg --add-architecture i386 || true
     apt update

@@ -30,10 +30,10 @@ wait_xrandr_output HDMI-0 || true
 
 # displays: left=DP-2@144, middle=DP-4@279.86 primary, right=DP-0@60
 xrandr \
-  --output DP-2 --mode 1920x1080 --rate 144 --pos 0x768 --rotate normal \
-  --output DP-4 --primary --mode 1920x1080 --rate 279.86 --pos 1920x768 --rotate normal \
-  --output DP-0 --mode 1920x1080 --rate 60 --pos 3840x768 --rotate normal \
-  --output HDMI-0 --mode 1360x768 --rate 60 --pos 2480x0 --rotate normal || true
+  --output DP-2 --mode 1920x1080 --rate 144 --pos -1920x0 --rotate normal \
+  --output DP-4 --primary --mode 1920x1080 --rate 279.86 --pos 0x0 --rotate normal \
+  --output DP-0 --mode 1920x1080 --rate 60 --pos 1920x0 --rotate normal \
+  --output HDMI-0 --mode 1360x768 --rate 60 --pos 560x-768 --rotate normal || true
 
 # mouse accel off (Logitech)
 wait_xinput_device "Logitech USB Receiver" || true
