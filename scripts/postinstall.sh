@@ -125,7 +125,8 @@ step_base_packages()
         traceroute \
         iproute2 \
         apt-file \
-        apt-utils
+        apt-utils \
+        xxd
 
 #    apt install -y intel-microcode || true
     apt install -y amd64-microcode || true
