@@ -423,7 +423,23 @@ EOF
 
 
     # osu!
-    local osu_url="https://github.com/ppy/osu/releases/latest/download/osu.AppImage"
+    local osu_url
+    osu_url="$(
+        curl -fsSL https://api.github.com/repos/ppy/osu/releases \
+        | jq -r '
+            map(select(.prerelease == true))
+            | sort_by(.published_at)
+            | last
+            | .assets[]
+            | select(.name | test("AppImage$"))
+            | .browser_download_url
+        ' 2>/dev/null
+    )"
+
+    if [[ -z "$osu_url" || "$osu_url" == "null" ]]; then
+        osu_url="https://github.com/ppy/osu/releases/latest/download/osu.AppImage"
+    fi
+
     local osu_tmpdir
     osu_tmpdir="$(mktemp -d)"
     local osu_appimage="$osu_tmpdir/osu.AppImage"
