@@ -10,9 +10,9 @@
 	process = git-lfs filter-process
 	required = true
 [alias]
-	shorttree = log --graph --simplify-by-decoration --pretty=format:'%d' --all
-	tree = log --oneline --graph --simplify-by-decoration --all
-	longtree = log --oneline --graph --decorate=full --all
+	shorttree = log --graph --pretty=format:'%d' --simplify-by-decoration --all
+	tree = log --graph --oneline --simplify-by-decoration --all
+	longtree = log --graph --oneline --all
 	longertree = log --graph --decorate=full --all
 	pruneremote = remote prune origin
 	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f"
