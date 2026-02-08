@@ -347,7 +347,7 @@ step_vscodium()
 
     # Source list
     cat >/etc/apt/sources.list.d/vscodium.list <<'EOF'
-deb [signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main
+deb [arch=amd64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main
 EOF
 
     apt update
