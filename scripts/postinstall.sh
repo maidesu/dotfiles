@@ -252,27 +252,16 @@ export PATH="$HOME/.local/bin:$PATH"
 ### /PYENV ###
 EOF'
 
-    run_as_user 'grep -q "### PYENV ###" "$HOME/.profile" 2>/dev/null || cat >>"$HOME/.profile" <<'"'"'EOF'"'"'
-### PYENV ###
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-export PATH="$HOME/.local/bin:$PATH"
-### /PYENV ###
-EOF'
-
     # Install / update pyenv via pyenv.run (pinned), then install requested Pythons + Poetry
     local tmp="/tmp/step_python.${TARGET_USER}.$$"
     cat >"$tmp" <<'EOS'
 set -euo pipefail
 
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$HOME/.local/bin:$PATH"
 
 # pin pyenv version
-export PYENV_GIT_TAG="v2.6.17"
+export PYENV_GIT_TAG="$(curl -fsSL https://api.github.com/repos/pyenv/pyenv/releases/latest | jq -r .tag_name)"
 
 if [[ ! -d "$PYENV_ROOT" ]]; then
   curl -fsSL https://pyenv.run | bash
@@ -282,21 +271,44 @@ else
 fi
 
 # Ensure pyenv is active in this shell
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$HOME/.local/bin:$PATH"
 eval "$(pyenv init -)"
 
 # Install requested Python versions (skip if already installed)
-for v in 3.9.25 3.10.19 3.11.14 3.12.12 3.13.11; do
-  pyenv install -s "$v"
+available_versions="$(pyenv install --list | sed 's/^[[:space:]]*//')"
+
+for minor in 3.10 3.11 3.12 3.13 3.14; do
+  latest="$(
+    printf '%s\n' "$available_versions" \
+      | grep -E "^${minor}\.[0-9]+$" \
+      | sort -V \
+      | tail -n1
+  )"
+
+  if [ -z "$latest" ]; then
+    echo "No installable version found for Python $minor" >&2
+    exit 1
+  fi
+
+  echo "Installing $latest"
+  pyenv install -s "$latest"
 done
 
 # Set default (global) python
-pyenv global 3.13.11
+default_minor="3.13"
+default="$(
+  printf '%s\n' "$available_versions" \
+    | grep -E "^${default_minor}\.[0-9]+$" \
+    | sort -V \
+    | tail -n1
+)"
+pyenv global "$default"
 pyenv rehash
 
 # Install Poetry using the default python
 python -m pip install --upgrade pip setuptools wheel
 curl -sSL https://install.python-poetry.org | python -
+pyenv rehash
 
 # Sanity prints
 python --version
