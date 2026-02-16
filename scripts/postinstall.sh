@@ -96,7 +96,6 @@ step_nvidia_sources()
 step_base_packages()
 {
     apt install -y linux-headers-amd64
-    apt install -y "linux-headers-$(uname -r)" || true
 
     apt install -y \
         firmware-misc-nonfree \
