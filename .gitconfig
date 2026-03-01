@@ -28,3 +28,5 @@
 [diff "xxd"]
 	textconv = xxd
 	binary = true
+[diff]
+	wsErrorHighlight = all
