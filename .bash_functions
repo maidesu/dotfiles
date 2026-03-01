@@ -27,12 +27,20 @@ as_on()
         pipewire-pulse.socket pipewire.socket \
         2>/dev/null || true
 
-    systemctl --user start pipewire.socket 2>/dev/null || true
+    systemctl --user start \
+        wireplumber.service \
+        pipewire.socket \
+        pipewire-pulse.socket \
+        2>/dev/null || true
 }
 
 as_rs()
 {
-    systemctl --user restart pipewire.socket 2>/dev/null || true
+    systemctl --user try-restart \
+        wireplumber.service \
+        pipewire.service \
+        pipewire-pulse.service \
+        2>/dev/null || true
 }
 
 as_st()
