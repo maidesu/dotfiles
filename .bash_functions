@@ -3,6 +3,7 @@ l()
     "$@" >/dev/null 2>&1 &
     disown
 }
+complete -o default -F _command l
 
 as_off()
 {
