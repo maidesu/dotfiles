@@ -36,9 +36,9 @@ xrandr \
   --output HDMI-0 --mode 1360x768 --rate 60 --pos 560x-768 --rotate normal || true
 
 # mouse accel off (Logitech)
-wait_xinput_device "Logitech USB Receiver" || true
-xinput set-prop "Logitech USB Receiver" "libinput Accel Profile Enabled" 0 1 0 || true
-xinput set-prop "Logitech USB Receiver" "libinput Accel Speed" 0 || true
+wait_xinput_device "pointer:Logitech X2 SUPERSTRIKE" || true
+xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Profile Enabled" 0 1 0 || true
+xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Speed" 0 || true
 
 # wacom raw-ish + area + map-to middle (DP-4)
 wait_xinput_device "Wacom Intuos Pro S Pen stylus" || true
