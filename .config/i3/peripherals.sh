@@ -2,45 +2,57 @@
 set -u
 #set -x
 
+log() {
+  printf '%s %s\n' "$(date '+%F %T')" "$*"
+}
+
 wait_xrandr_output() {
   out="$1"
   i=0
   while ! xrandr --query 2>/dev/null | grep -q "^${out} connected"; do
+    if [ "$i" -ge 100 ]; then
+      log "wait_xrandr_output: $out timed out after ${i} loops (~$((i * 50))ms)"
+      return 1
+    fi
     i=$((i+1))
-    [ "$i" -gt 100 ] && return 1
     sleep 0.05
   done
+  log "wait_xrandr_output: $out ready after ${i} loops (~$((i * 50))ms)"
 }
 
 wait_xinput_device() {
   name="$1"
   i=0
   while ! xinput list --name-only 2>/dev/null | grep -Fxq "$name"; do
+    if [ "$i" -ge 100 ]; then
+      log "wait_xinput_device: $name timed out after ${i} loops (~$((i * 50))ms)"
+      return 1
+    fi
     i=$((i+1))
-    [ "$i" -gt 100 ] && return 1
     sleep 0.05
   done
+  log "wait_xinput_device: $name ready after ${i} loops (~$((i * 50))ms)"
 }
 
-# wait for outputs
+log "waiting for outputs"
 wait_xrandr_output DP-2 || true
 wait_xrandr_output DP-4 || true
 wait_xrandr_output DP-0 || true
 wait_xrandr_output HDMI-0 || true
 
-# displays: left=DP-2@144, middle=DP-4@279.86 primary, right=DP-0@60
+log "applying display layout"
 xrandr \
   --output DP-2 --mode 1920x1080 --rate 144 --pos -1920x0 --rotate normal \
   --output DP-4 --primary --mode 1920x1080 --rate 279.86 --pos 0x0 --rotate normal \
   --output DP-0 --mode 1920x1080 --rate 60 --pos 1920x0 --rotate normal \
   --output HDMI-0 --mode 1360x768 --rate 60 --pos 560x-768 --rotate normal || true
 
-# mouse accel off (Logitech)
+log "applying mouse settings"
 wait_xinput_device "pointer:Logitech X2 SUPERSTRIKE" || true
 xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Profile Enabled" 0 1 0 || true
 xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Speed" 0 || true
 
-# wacom raw-ish + area + map-to middle (DP-4)
+log "applying wacom settings"
 wait_xinput_device "Wacom Intuos Pro S Pen stylus" || true
 wait_xinput_device "Wacom Intuos Pro S Pen eraser" || true
 wait_xinput_device "Wacom Intuos Pro S Pad pad" || true
@@ -60,11 +72,11 @@ xsetwacom --set "Wacom Intuos Pro S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" MapToOutput HEAD-0 || true
 
-# gpu settings
+log "applying gpu settings"
 nvidia-settings \
   --assign SyncToVBlank=0 \
   --assign AllowFlipping=1 \
   --assign GPUPowerMizerMode=1
 
-# wallpapers
+log "applying wallpapers"
 feh --bg-fill --randomize ~/Downloads/desktopwallpaper/* || true
