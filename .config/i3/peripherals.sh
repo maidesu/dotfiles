@@ -54,8 +54,6 @@ xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Speed" 0 || tr
 
 log "applying wacom settings"
 wait_xinput_device "Wacom Intuos Pro S Pen stylus" || true
-wait_xinput_device "Wacom Intuos Pro S Pen eraser" || true
-wait_xinput_device "Wacom Intuos Pro S Pad pad" || true
 
 xsetwacom --set "Wacom Intuos Pro S Pen stylus" Suppress 0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" Suppress 0 || true
