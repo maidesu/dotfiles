@@ -48,7 +48,7 @@ xrandr \
   --output HDMI-0 --mode 1360x768 --rate 60 --pos 560x-768 --rotate normal || true
 
 log "applying mouse settings"
-wait_xinput_device "pointer:Logitech X2 SUPERSTRIKE" || true
+wait_xinput_device "Logitech X2 SUPERSTRIKE" || true
 xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Profile Enabled" 0 1 0 || true
 xinput set-prop "pointer:Logitech X2 SUPERSTRIKE" "libinput Accel Speed" 0 || true
 
