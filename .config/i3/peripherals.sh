@@ -60,7 +60,11 @@ xsetwacom --set "Wacom Intuos Pro S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" MapToOutput HEAD-0 || true
 
+# gpu settings
 nvidia-settings \
   --assign SyncToVBlank=0 \
   --assign AllowFlipping=1 \
   --assign GPUPowerMizerMode=1
+
+# wallpapers
+feh --bg-fill --randomize ~/Downloads/desktopwallpaper/* || true

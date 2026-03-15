@@ -197,13 +197,9 @@ bindsym $mod+Shift+s exec --no-startup-id sh -c 'dir="$HOME/Pictures" && f="$dir
 exec_always --no-startup-id sh -c 'nvidia-settings --load-config-only || true'
 
 # Peripherals
-exec_always --no-startup-id ~/.config/i3/peripherals.sh
-#exec --no-startup-id sh -c '~/.config/i3/peripherals.sh >> "$HOME/i3-peripherals.log" 2>&1'
+exec_always --no-startup-id sh -c '~/.config/i3/peripherals.sh > "$HOME/i3-peripherals.log" 2>&1'
 
 workspace 1 output DP-4
 workspace 2 output DP-2
 workspace 3 output DP-0
 workspace 4 output HDMI-0
-
-# Wallpapers
-exec_always --no-startup-id feh --bg-fill --randomize ~/Downloads/desktopwallpaper/*
