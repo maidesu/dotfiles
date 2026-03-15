@@ -62,5 +62,5 @@ xsetwacom --set "Wacom Intuos Pro S Pad pad" MapToOutput HEAD-0 || true
 
 nvidia-settings \
   --assign SyncToVBlank=0 \
-  --assign AllowVRR=0 \
+  --assign AllowFlipping=1 \
   --assign GPUPowerMizerMode=1
