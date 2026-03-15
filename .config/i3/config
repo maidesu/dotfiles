@@ -190,6 +190,9 @@ bar {
 }
 
 
+# Resources
+exec_always --no-startup-id xrdb -merge ~/.Xresources
+
 # Screenshot
 bindsym $mod+Shift+s exec --no-startup-id sh -c 'dir="$HOME/Pictures" && f="$dir/shot-$(date +%F_%H-%M-%S).png" && maim -s "$f" && xclip -selection clipboard -t image/png -i "$f"'
 
