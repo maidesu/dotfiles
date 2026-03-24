@@ -405,6 +405,7 @@ step_flatpak()
     apt install -y flatpak
 
     local bin_dir="/usr/local/bin"
+    install -d -m 0755 "$bin_dir"
 
     flatpak remote-add --if-not-exists flathub \
         https://dl.flathub.org/repo/flathub.flatpakrepo
