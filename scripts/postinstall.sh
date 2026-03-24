@@ -400,38 +400,33 @@ step_deb_packages()
     rm -f "$discord_deb"
 }
 
+step_flatpak()
+{
+    apt install -y flatpak
+
+    local bin_dir="/usr/local/bin"
+
+    flatpak remote-add --if-not-exists flathub \
+        https://dl.flathub.org/repo/flathub.flatpakrepo
+
+    # Chatterino
+    local chatterino_wrapper="$bin_dir/chatterino"
+
+    flatpak install -y flathub com.chatterino.chatterino
+
+    cat >"$chatterino_wrapper" <<'EOF'
+#!/bin/sh
+exec flatpak run com.chatterino.chatterino "$@"
+EOF
+    chmod 0755 "$chatterino_wrapper"
+}
+
 step_appimages()
 {
     apt install -y ca-certificates curl
 
     local bin_dir="/usr/local/bin"
     local opt_dir="/opt"
-
-    # Chatterino
-    local chatterino_url="https://chatterino.fra1.digitaloceanspaces.com/bin/2.5.4/Chatterino-x86_64.AppImage"
-    local chatterino_tmpdir
-    chatterino_tmpdir="$(mktemp -d)"
-    local chatterino_appimage="$chatterino_tmpdir/chatterino.AppImage"
-    local chatterino_optdir="$opt_dir/chatterino"
-    local chatterino_wrapper="$bin_dir/chatterino"
-
-    curl -fL --retry 3 --retry-delay 1 "$chatterino_url" -o "$chatterino_appimage"
-    chmod +x "$chatterino_appimage"
-
-    ( cd "$chatterino_tmpdir" && ./chatterino.AppImage --appimage-extract >/dev/null )
-
-    rm -rf "$chatterino_optdir"
-    mv "$chatterino_tmpdir/squashfs-root" "$chatterino_optdir"
-    chmod +x "$chatterino_optdir/AppRun"
-
-    cat >"$chatterino_wrapper" <<'EOF'
-#!/usr/bin/env bash
-exec /opt/chatterino/AppRun "$@"
-EOF
-    chmod 0755 "$chatterino_wrapper"
-
-    rm -rf "$chatterino_tmpdir"
-
 
     # osu!
     local osu_url
@@ -548,6 +543,7 @@ main()
 
     step_app_packages
     step_deb_packages
+    step_flatpak
     step_appimages
 
     step_osu_game
