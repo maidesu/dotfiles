@@ -239,7 +239,7 @@ step_python()
         libncurses-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
         libffi-dev liblzma-dev libgdbm-dev libnss3-dev uuid-dev
 
-    # Persist pyenv + ~/.local/bin for the target user
+    # Persist pyenv for the target user
     run_as_user 'grep -q "### PYENV ###" "$HOME/.bashrc" 2>/dev/null || cat >>"$HOME/.bashrc" <<'"'"'EOF'"'"'
 ### PYENV ###
 export PYENV_ROOT="$HOME/.pyenv"
@@ -247,7 +247,6 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 if command -v pyenv >/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
-export PATH="$HOME/.local/bin:$PATH"
 ### /PYENV ###
 EOF'
 
