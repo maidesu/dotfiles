@@ -531,8 +531,8 @@ main()
     #step_r8125
     step_disable_wol
 
-    #step_disable_wayland
-    #step_i3
+    step_disable_wayland
+    step_i3
 
     step_skip_grub
 
