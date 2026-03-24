@@ -2,7 +2,7 @@
 # /home/mai/.nvidia-settings-rc
 #
 # Configuration file for nvidia-settings - the NVIDIA Settings utility
-# Generated on Wed Jan 28 20:04:41 2026
+# Generated on Mon Mar 23 00:34:49 2026
 #
 
 # ConfigProperties:
@@ -12,9 +12,9 @@ DisplayStatusBar = Yes
 SliderTextEntries = Yes
 IncludeDisplayNameInConfigFile = Yes
 UpdateRulesOnProfileNameChange = Yes
-Timer = PowerMizer_Monitor_(GPU_0),Yes,1000
-Timer = Thermal_Monitor_(GPU_0),Yes,1000
 Timer = Memory_Used_(GPU_0),Yes,3000
+Timer = Thermal_Monitor_(GPU_0),Yes,1000
+Timer = PowerMizer_Monitor_(GPU_0),Yes,1000
 
 # Attributes:
 
@@ -23,7 +23,7 @@ Toga:0.0/LogAniso=0
 Toga:0.0/FSAA=0
 Toga:0.0/TextureClamping=0
 Toga:0.0/FXAA=0
-Toga:0.0/AllowFlipping=0
+Toga:0.0/AllowFlipping=1
 Toga:0.0/FSAAAppControlled=1
 Toga:0.0/LogAnisoAppControlled=1
 Toga:0.0/OpenGLImageSettings=3
