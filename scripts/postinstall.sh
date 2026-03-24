@@ -424,10 +424,11 @@ EOF
 
 step_appimages()
 {
-    apt install -y ca-certificates curl
+    apt install -y ca-certificates curl jq
 
     local bin_dir="/usr/local/bin"
     local opt_dir="/opt"
+    install -d -m 0755 "$bin_dir" "$opt_dir"
 
     # osu!
     local osu_url
@@ -462,9 +463,9 @@ step_appimages()
     mv "$osu_tmpdir/squashfs-root" "$osu_optdir"
     chmod +x "$osu_optdir/AppRun"
 
-    cat >"$osu_wrapper" <<'EOF'
+    cat >"$osu_wrapper" <<EOF
 #!/usr/bin/env bash
-exec /opt/osu/AppRun "$@"
+exec "$osu_optdir/AppRun" "\$@"
 EOF
     chmod 0755 "$osu_wrapper"
 
