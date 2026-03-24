@@ -472,7 +472,7 @@ EOF
     rm -rf "$osu_tmpdir"
 }
 
-step_osu_game()
+step_gamemode()
 {
     apt install -y gamemode
 
@@ -482,7 +482,7 @@ step_osu_game()
 
     run_as_user 'mkdir -p "$HOME/.local/bin"
 
-cat >"$HOME/.local/bin/osu2" <<'"'"'EOF'"'"'
+cat >"$HOME/.local/bin/osu" <<'"'"'EOF'"'"'
 #!/usr/bin/env bash
 export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
@@ -491,10 +491,10 @@ export __GL_MaxFramesAllowed=1
 export __GL_YIELD="USLEEP"
 export SDL_VIDEODRIVER=x11
 
-exec gamemoderun osu "$@" >/dev/null 2>&1
+exec gamemoderun /usr/local/bin/osu "$@" >/dev/null 2>&1
 EOF
 
-chmod 0755 "$HOME/.local/bin/osu2"
+chmod 0755 "$HOME/.local/bin/osu"
 '
 }
 
@@ -548,7 +548,7 @@ main()
     step_flatpak
     step_appimages
 
-    step_osu_game
+    step_gamemode
 
     finalize
 }
