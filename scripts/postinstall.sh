@@ -487,7 +487,7 @@ export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
 export __GL_VRR_ALLOWED=0
 export __GL_MaxFramesAllowed=1
-export __GL_YIELD="USLEEP"
+export __GL_YIELD=NOTHING
 export SDL_VIDEODRIVER=x11
 
 exec gamemoderun /usr/local/bin/osu "$@"
