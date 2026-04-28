@@ -5,7 +5,7 @@ l()
 }
 complete -o default -F _command l
 
-as_off()
+as-off()
 {
     systemctl --user stop \
         pipewire-pulse.socket pipewire.socket \
@@ -20,7 +20,7 @@ as_off()
         2>/dev/null || true
 }
 
-as_on()
+as-on()
 {
     systemctl --user unmask \
         wireplumber.service wireplumber@.service \
@@ -35,7 +35,7 @@ as_on()
         2>/dev/null || true
 }
 
-as_rs()
+as-rs()
 {
     systemctl --user try-restart \
         wireplumber.service \
@@ -44,7 +44,7 @@ as_rs()
         2>/dev/null || true
 }
 
-as_st()
+as-st()
 {
     local units=(
         pipewire.socket
