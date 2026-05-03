@@ -167,7 +167,51 @@ EOF
 
 step_i3()
 {
-    apt install i3-wm i3status i3lock xorg xserver-xorg xterm xinput feh
+    apt install -y \
+        i3-wm \
+        i3status \
+        i3lock \
+        xorg \
+        xserver-xorg \
+        xterm \
+        xinput \
+        feh \
+        dmenu \
+        dex \
+        kitty \
+        lightdm \
+        lightdm-gtk-greeter \
+        lightdm-gtk-greeter-settings \
+        mate-polkit \
+        pavucontrol \
+        xdg-desktop-portal \
+        xdg-desktop-portal-gtk \
+        dbus-user-session
+
+    if command -v update-alternatives >/dev/null && command -v kitty >/dev/null; then
+        update-alternatives --set x-terminal-emulator /usr/bin/kitty || true
+    fi
+
+    if [[ -x /usr/sbin/lightdm ]]; then
+        echo /usr/sbin/lightdm >/etc/X11/default-display-manager
+        systemctl enable lightdm.service || true
+    fi
+
+    run_as_user 'cat >"$HOME/.xsession" <<'"'"'EOF'"'"'
+#!/bin/sh
+exec i3
+EOF
+chmod 0755 "$HOME/.xsession"
+
+mkdir -p "$HOME/.config/kitty"
+grep -q "^enable_audio_bell " "$HOME/.config/kitty/kitty.conf" 2>/dev/null \
+  && sed -i "s/^enable_audio_bell .*/enable_audio_bell no/" "$HOME/.config/kitty/kitty.conf" \
+  || printf "%s\n" "enable_audio_bell no" >>"$HOME/.config/kitty/kitty.conf"
+
+if grep -q "xterm-color|\\*-256color)" "$HOME/.bashrc" 2>/dev/null; then
+  sed -i "s/xterm-color|\\*-256color)/xterm-color|\\*-256color|xterm-kitty)/" "$HOME/.bashrc"
+fi
+'
 }
 
 step_disable_wol()
@@ -374,7 +418,6 @@ step_app_packages()
         ffmpeg \
         mpv \
         yt-dlp \
-        baobab \
         gimp \
         notepadqq \
         chromium \
