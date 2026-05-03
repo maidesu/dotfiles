@@ -187,6 +187,10 @@ step_i3()
         dmenu \
         dex \
         kitty \
+        arc-theme \
+        thunar \
+        thunar-archive-plugin \
+        xarchiver \
         lightdm \
         lightdm-gtk-greeter \
         lightdm-gtk-greeter-settings \
