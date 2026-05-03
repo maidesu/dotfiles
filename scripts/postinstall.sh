@@ -246,6 +246,16 @@ step_disable_wayland()
     fi
 }
 
+step_power_profile()
+{
+    apt install -y power-profiles-daemon
+
+    if command -v powerprofilesctl >/dev/null; then
+        powerprofilesctl set performance || true
+        powerprofilesctl get || true
+    fi
+}
+
 step_skip_grub()
 {
     apt purge -y os-prober || true
@@ -583,6 +593,7 @@ main()
     step_disable_wol
 
     step_disable_wayland
+    step_power_profile
     step_i3
 
     step_skip_grub
