@@ -155,6 +155,13 @@ fi
 EOF'
 }
 
+step_keyring()
+{
+    apt install -y \
+        gnome-keyring \
+        libpam-gnome-keyring
+}
+
 step_r8125()
 {
     apt install -y dkms mokutil
@@ -608,6 +615,7 @@ main()
 
     step_base_packages
     step_gpg
+    step_keyring
 
     #step_r8125
     step_disable_wol
