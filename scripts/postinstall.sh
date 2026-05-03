@@ -424,9 +424,13 @@ step_app_packages()
         maim \
         slop \
         xclip
+}
 
+step_steam()
+{
     dpkg --add-architecture i386 || true
     apt update
+
     apt install -y nvidia-driver-libs:i386 steam-installer steam-devices
 }
 
@@ -586,6 +590,7 @@ main()
     step_vscodium
 
     step_app_packages
+    step_steam
     step_deb_packages
     step_flatpak
     step_appimages
