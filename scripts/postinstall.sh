@@ -127,8 +127,11 @@ step_base_packages()
         apt-utils \
         xxd
 
-#    apt install -y intel-microcode || true
-    apt install -y amd64-microcode || true
+    case "$(lscpu | awk -F: '/Vendor ID/{gsub(/^[ \t]+/, "", $2); print $2}')" in
+        AuthenticAMD) apt install -y amd64-microcode || true ;;
+        GenuineIntel) apt install -y intel-microcode || true ;;
+        *) echo "Unknown CPU vendor; skipping CPU microcode package." ;;
+    esac
 }
 
 step_r8125()
