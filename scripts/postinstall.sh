@@ -117,6 +117,11 @@ step_base_packages()
         htop \
         ethtool \
         dos2unix \
+        7zip \
+        bluez \
+        fwupd \
+        fwupd-amd64-signed \
+        systemd-oomd \
         nftables \
         jq \
         ripgrep \
