@@ -440,7 +440,6 @@ step_app_packages()
         notepadqq \
         chromium \
         maim \
-        slop \
         xclip
 }
 
