@@ -234,6 +234,7 @@ step_i3()
 
     run_as_user 'cat >"$HOME/.xsession" <<'"'"'EOF'"'"'
 #!/bin/sh
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
 exec i3
 EOF
 chmod 0755 "$HOME/.xsession"
