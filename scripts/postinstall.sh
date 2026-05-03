@@ -139,6 +139,22 @@ step_base_packages()
     esac
 }
 
+step_gpg()
+{
+    apt install -y \
+        gnupg \
+        pinentry-curses
+
+    run_as_user 'grep -q "### GPG TTY ###" "$HOME/.bashrc" 2>/dev/null || cat >>"$HOME/.bashrc" <<'"'"'EOF'"'"'
+### GPG TTY ###
+if [ -t 1 ]; then
+    export GPG_TTY="$(tty)"
+    gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true
+fi
+### /GPG TTY ###
+EOF'
+}
+
 step_r8125()
 {
     apt install -y dkms mokutil
@@ -591,6 +607,7 @@ main()
     step_nvidia_sources
 
     step_base_packages
+    step_gpg
 
     #step_r8125
     step_disable_wol
