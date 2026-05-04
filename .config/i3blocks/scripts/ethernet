@@ -1,0 +1,49 @@
+#!/bin/sh
+
+. "$HOME/.config/i3blocks/colors.sh"
+
+
+iface=""
+
+for path in /sys/class/net/*
+do
+    name="$(basename "$path")"
+
+    [ "$name" = "lo" ] && continue
+    [ -d "$path/wireless" ] && continue
+    [ -e "$path/device" ] || continue
+
+    iface="$name"
+    break
+done
+
+if [ -z "$iface" ]
+then
+    echo "E: none"
+    echo "E"
+    echo "$bright_black"
+    exit 0
+fi
+
+if [ "$(cat "/sys/class/net/$iface/carrier" 2>/dev/null)" != "1" ]
+then
+    echo "E: down"
+    echo "E"
+    echo "$bright_red"
+    exit 0
+fi
+
+
+speed="$(cat "/sys/class/net/$iface/speed" 2>/dev/null)"
+
+case "$speed" in
+    ""|-1)
+        echo "E: up"
+        ;;
+    *)
+        echo "E: ${speed}M"
+        ;;
+esac
+
+echo "E"
+echo "$bright_green"

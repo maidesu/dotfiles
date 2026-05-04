@@ -200,7 +200,7 @@ step_i3()
 {
     apt install -y \
         i3-wm \
-        i3status \
+        i3blocks \
         i3lock \
         xorg \
         xserver-xorg \
