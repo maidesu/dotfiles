@@ -20,6 +20,9 @@ interval=5
 [ethernet]
 interval=10
 
+[nvidia]
+interval=5
+
 [volume]
 interval=15
 signal=11

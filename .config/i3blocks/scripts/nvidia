@@ -1,0 +1,80 @@
+#!/bin/sh
+
+. "$HOME/.config/i3blocks/colors.sh"
+
+
+if ! command -v nvidia-smi >/dev/null 2>&1
+then
+    echo "GPU: n/a"
+    echo
+    echo "$bright_black"
+    exit 0
+fi
+
+
+stats="$(
+    nvidia-smi \
+        --query-gpu=utilization.gpu,memory.used,memory.total \
+        --format=csv,noheader,nounits \
+        2>/dev/null |
+    head -n 1
+)"
+
+if [ -z "$stats" ]
+then
+    echo "GPU: none"
+    echo
+    echo "$bright_black"
+    exit 0
+fi
+
+
+parsed="$(
+    printf "%s\n" "$stats" |
+    awk -F, '
+        {
+            gsub(/ /, "", $1)
+            gsub(/ /, "", $2)
+            gsub(/ /, "", $3)
+
+            util = $1
+            mem_used = $2
+            mem_total = $3
+
+            if (mem_total <= 0) {
+                mem_pct = 0
+            } else {
+                mem_pct = int((mem_used * 100 / mem_total) + 0.5)
+            }
+
+            print util, mem_used, mem_total, mem_pct
+        }
+    '
+)"
+
+set -- $parsed
+
+util="$1"
+mem_used="$2"
+mem_total="$3"
+mem_pct="$4"
+
+if [ -z "$util" ] || [ -z "$mem_used" ] || [ -z "$mem_total" ] || [ -z "$mem_pct" ]
+then
+    echo "GPU: ?"
+    echo "GPU"
+    echo "$bright_magenta"
+    exit 0
+fi
+
+
+echo "GPU: ${util}% ${mem_used}/${mem_total}MiB"
+echo "${util}% ${mem_used}MiB"
+
+if [ "$util" -ge 90 ] || [ "$mem_pct" -ge 90 ]
+then
+    echo "$bright_red"
+elif [ "$util" -ge 60 ] || [ "$mem_pct" -ge 60 ]
+then
+    echo "$bright_yellow"
+fi
