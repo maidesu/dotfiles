@@ -18,10 +18,10 @@ interval=5
 interval=5
 
 [ethernet]
-interval=5
+interval=10
 
 [volume]
-interval=10
+interval=15
 signal=11
 
 [time]
