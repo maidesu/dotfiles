@@ -63,8 +63,8 @@ xsetwacom --set "Wacom Intuos Pro S Pen stylus" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" RawSample 1 || true
 
-xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 10400 5850 || true
-xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 10400 5850 || true
+xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 10160 5715 || true
+xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 10160 5715 || true
 
 xsetwacom --set "Wacom Intuos Pro S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" MapToOutput HEAD-0 || true

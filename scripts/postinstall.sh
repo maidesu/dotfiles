@@ -582,12 +582,15 @@ step_gamemode()
 
 cat >"$HOME/.local/bin/osu" <<'"'"'EOF'"'"'
 #!/usr/bin/env bash
+export SDL_VIDEODRIVER=x11
+export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1
+
 export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
 export __GL_VRR_ALLOWED=0
 export __GL_MaxFramesAllowed=1
 export __GL_YIELD=NOTHING
-export SDL_VIDEODRIVER=x11
+export __GL_THREADED_OPTIMIZATIONS=0
 
 exec gamemoderun /usr/local/bin/osu "$@"
 EOF
