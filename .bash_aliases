@@ -1,6 +1,7 @@
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 alias cl='clear'
+alias cls='printf "\033[H\033[2J\033[3J"'
 alias cwd2lf='find . -type f -exec dos2unix {} +'
 alias ll='ls -lahF'
 
