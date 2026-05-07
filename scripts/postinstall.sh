@@ -486,20 +486,19 @@ step_steam()
     apt install -y nvidia-driver-libs:i386 steam-installer steam-devices
 }
 
-step_deb_packages()
-{
-    apt install -y ca-certificates curl
-
-    # Discord
-    local discord_url="https://discord.com/api/download?platform=linux&format=deb"
-    local discord_deb="/tmp/discord.deb"
-    curl -fL --retry 3 --retry-delay 1 "$discord_url" -o "$discord_deb"
-    apt install -y "$discord_deb"
-    rm -f "$discord_deb"
-}
-
 step_flatpak()
 {
+    flatpak_run_wrapper()
+    {
+        flatpak install -y flathub "$1"
+
+        cat >"$2" <<EOF
+#!/bin/sh
+exec flatpak run "$1" "\$@"
+EOF
+        chmod 0755 "$2"
+    }
+
     apt install -y flatpak
 
     local bin_dir="/usr/local/bin"
@@ -508,16 +507,10 @@ step_flatpak()
     flatpak remote-add --if-not-exists flathub \
         https://dl.flathub.org/repo/flathub.flatpakrepo
 
-    # Chatterino
-    local chatterino_wrapper="$bin_dir/chatterino"
+    flatpak_run_wrapper com.chatterino.chatterino "$bin_dir/chatterino"
+    flatpak_run_wrapper com.discordapp.Discord "$bin_dir/discord"
 
-    flatpak install -y flathub com.chatterino.chatterino
-
-    cat >"$chatterino_wrapper" <<'EOF'
-#!/bin/sh
-exec flatpak run com.chatterino.chatterino "$@"
-EOF
-    chmod 0755 "$chatterino_wrapper"
+    unset -f flatpak_run_wrapper
 }
 
 step_appimages()
@@ -649,7 +642,6 @@ main()
 
     step_app_packages
     step_steam
-    step_deb_packages
     step_flatpak
     step_appimages
 
