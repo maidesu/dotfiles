@@ -35,11 +35,11 @@ exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id nm-applet
 
 # Use wpctl to adjust volume in WirePlumber.
-set $refresh_i3blocks_audio pkill -RTMIN+11 i3blocks
-bindsym XF86AudioRaiseVolume exec --no-startup-id wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && $refresh_i3blocks_audio
-bindsym XF86AudioLowerVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && $refresh_i3blocks_audio
-bindsym XF86AudioMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && $refresh_i3blocks_audio
-bindsym XF86AudioMicMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && $refresh_i3blocks_audio
+set $refresh_status pkill -SIGUSR1 i3status-rs
+bindsym XF86AudioRaiseVolume exec --no-startup-id wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && $refresh_status
+bindsym XF86AudioLowerVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && $refresh_status
+bindsym XF86AudioMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && $refresh_status
+bindsym XF86AudioMicMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && $refresh_status
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -185,13 +185,12 @@ bindsym $mod+r mode "resize"
 
 bindsym $mod+n bar mode toggle
 
-# Start i3bar to display a workspace bar (plus the system information i3blocks
-# finds out, if available)
+# Start i3bar to display a workspace bar
 bar {
         #output primary
         tray_output primary
-        status_command i3blocks -c ~/.config/i3blocks/config
         #mode hide
+        status_command ~/.cargo/bin/i3status-rs ~/.config/i3status-rust/config.toml
 }
 
 

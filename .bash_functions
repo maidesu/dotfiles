@@ -18,6 +18,8 @@ as-off()
         pipewire-pulse.service pipewire.service \
         wireplumber.service wireplumber@.service \
         2>/dev/null || true
+
+    pkill -x -SIGUSR2 i3status-rs 2>/dev/null || true
 }
 
 as-on()
@@ -33,6 +35,8 @@ as-on()
         pipewire.socket \
         pipewire-pulse.socket \
         2>/dev/null || true
+
+    pkill -x -SIGUSR2 i3status-rs 2>/dev/null || true
 }
 
 as-rs()
@@ -42,6 +46,8 @@ as-rs()
         pipewire.service \
         pipewire-pulse.service \
         2>/dev/null || true
+
+    pkill -x -SIGUSR2 i3status-rs 2>/dev/null || true
 }
 
 as-st()
