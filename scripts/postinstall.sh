@@ -578,6 +578,12 @@ cat >"$HOME/.local/bin/osu" <<'"'"'EOF'"'"'
 export SDL_VIDEODRIVER=x11
 export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1
 
+export SDL_PEN_MOUSE_EVENTS=1
+export SDL_PEN_TOUCH_EVENTS=0
+
+export SDL_AUDIODRIVER=alsa
+export MAI_ALSA_PCM=osu
+
 export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
 export __GL_VRR_ALLOWED=0
