@@ -233,15 +233,8 @@ step_i3()
     fi
 
     run_as_user 'cat >"$HOME/.xsession" <<'"'"'EOF'"'"'
-#!/usr/bin/env bash
-if [ -f "$HOME/.profile" ]; then
-    bash_version_temp=${BASH_VERSION-}
-    unset BASH_VERSION
-    . "$HOME/.profile"
-    BASH_VERSION=$bash_version_temp
-    unset bash_version_temp
-fi
-
+#!/bin/sh
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
 exec i3
 EOF
 chmod 0755 "$HOME/.xsession"
