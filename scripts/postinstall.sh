@@ -626,44 +626,91 @@ finalize()
 
 main()
 {
+    local preset="${1:-default}"
+
     require_root
     detect_os
     detect_user
 
-    step_apt_sources
-    step_nvidia_sources
+    case "$preset" in
+        default)
+            step_apt_sources
+            step_nvidia_sources
 
-    step_base_packages
-    step_gpg
-    step_keyring
+            step_base_packages
+            step_gpg
+            step_keyring
 
-    #step_r8125
-    step_disable_wol
+            step_disable_wol
 
-    step_disable_wayland
-    step_power_profile
-    step_i3
+            step_disable_wayland
+            step_power_profile
+            step_i3
 
-    step_skip_grub
+            step_skip_grub
 
-    step_nvidia_driver
-    step_mok_pub
+            step_nvidia_driver
+            step_mok_pub
 
-    step_bash_functions
+            step_bash_functions
 
-    step_python
-    step_docker
+            step_python
+            step_docker
 
-    step_vscodium
+            step_vscodium
 
-    step_app_packages
-    step_steam
-    step_flatpak
-    step_appimages
+            step_app_packages
+            step_steam
+            step_flatpak
+            step_appimages
 
-    step_gamemode
+            step_gamemode
 
-    finalize
+            finalize
+            ;;
+        all)
+            step_apt_sources
+            step_nvidia_sources
+
+            step_base_packages
+            step_gpg
+            step_keyring
+
+            step_r8125
+            step_disable_wol
+
+            step_disable_wayland
+            step_power_profile
+            step_i3
+
+            step_skip_grub
+
+            step_nvidia_driver
+            step_mok_pub
+
+            step_bash_functions
+
+            step_python
+            step_docker
+
+            step_vscodium
+
+            step_app_packages
+            step_steam
+            step_flatpak
+            step_appimages
+
+            step_gamemode
+
+            finalize
+            ;;
+        osu)
+            step_appimages
+            ;;
+        *)
+            die "Unknown preset '$preset'. Use: default, all, osu."
+            ;;
+    esac
 }
 
 main "$@"
