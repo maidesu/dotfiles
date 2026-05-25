@@ -68,12 +68,14 @@ pcm.nullsink {
 pcm.osu {
     type dmix
     ipc_key 7272
+    ipc_perm 0600
     slave board-osu
 }
 
 pcm.cs2 {
     type dmix
     ipc_key 6969
+    ipc_perm 0600
     slave board-cs2
 }
 
