@@ -1,0 +1,19 @@
+[icons]
+icons = "none"
+
+[theme]
+theme = "plain"
+[theme.overrides]
+separator = " | "
+
+[[block]]
+block = "sound"
+driver = "auto"
+step_width = 5
+max_vol = 150
+format = "Vol: {$volume.eng(w:3)|mute}"
+
+[[block]]
+block = "time"
+interval = 1
+format = "$timestamp.datetime(f:'%Y.%m.%d. %H:%M:%S')"
