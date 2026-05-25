@@ -575,14 +575,24 @@ step_gamemode()
 
 cat >"$HOME/.local/bin/osu" <<'"'"'EOF'"'"'
 #!/usr/bin/env bash
+export OSU_DISABLE_ERROR_REPORTING=1
+
 export SDL_VIDEODRIVER=x11
 export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1
+
+unset SDL_IM_MODULE
+unset GTK_IM_MODULE
+unset QT_IM_MODULE
+unset CLUTTER_IM_MODULE
+unset XMODIFIERS
 
 export SDL_PEN_MOUSE_EVENTS=1
 export SDL_PEN_TOUCH_EVENTS=0
 
 export SDL_AUDIODRIVER=alsa
-export MAI_ALSA_PCM=osu
+export MAI_ALSA_PCM=hw_board
+#export MAI_ALSA_PCM=osu
+export OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-64
 
 export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
