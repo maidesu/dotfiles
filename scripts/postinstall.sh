@@ -207,7 +207,6 @@ step_i3()
         xterm \
         xinput \
         feh \
-        dmenu \
         dex \
         kitty \
         arc-theme \
