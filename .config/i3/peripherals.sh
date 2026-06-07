@@ -63,12 +63,29 @@ xsetwacom --set "Wacom Intuos Pro S Pen stylus" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" RawSample 1 || true
 
-xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 8800 4950 || true
-xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 8800 4950 || true
+xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 7776 4374 || true
+xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 7776 4374 || true
 
 xsetwacom --set "Wacom Intuos Pro S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" MapToOutput HEAD-0 || true
+
+#wait_xinput_device "Wacom One by Wacom S Pen stylus" || true
+
+xsetwacom --set "Wacom One by Wacom S Pen stylus" Suppress 0 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" Suppress 0 || true
+
+xsetwacom --set "Wacom One by Wacom S Pen stylus" RawSample 1 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" RawSample 1 || true
+
+xsetwacom --set "Wacom One by Wacom S Pen stylus" Area 11312 7313 15200 9500 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" Area 11312 7313 15200 9500 || true
+
+xsetwacom --set "Wacom One by Wacom S Pen stylus" MapToOutput HEAD-0 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" MapToOutput HEAD-0 || true
+
+xsetwacom --set "Wacom One by Wacom S Pen stylus" Rotate half || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" Rotate half || true
 
 log "applying gpu settings"
 nvidia-settings \
