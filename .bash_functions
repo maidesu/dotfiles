@@ -1,9 +1,14 @@
 l()
 {
-    "$@" >/dev/null 2>&1 &
-    disown
+    "$@" </dev/null >/dev/null 2>&1 & disown
 }
 complete -o default -F _command l
+
+lsid()
+{
+    setsid "$@" </dev/null >/dev/null 2>&1 &
+}
+complete -o default -F _command lsid
 
 au()
 {
