@@ -132,6 +132,9 @@ step_base_packages()
         apt-utils \
         xxd
 
+    # Don't reset my Wacom tablet mid-play, thanks.
+    systemctl disable --now fwupd-refresh.timer
+
     case "$(lscpu | awk -F: '/Vendor ID/{gsub(/^[ \t]+/, "", $2); print $2}')" in
         AuthenticAMD) apt install -y amd64-microcode || true ;;
         GenuineIntel) apt install -y intel-microcode || true ;;
