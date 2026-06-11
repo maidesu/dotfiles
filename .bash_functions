@@ -28,15 +28,21 @@ au()
             systemctl --user mask --now \
                 "${sockets[@]}" "${services[@]}" \
                 2>/dev/null || true
+            systemctl --user try-restart xdg-desktop-portal.service \
+                2>/dev/null || true
             ;;
         on)
             systemctl --user unmask \
                 "${sockets[@]}" "${services[@]}" \
                 2>/dev/null || true
             systemctl --user start "${sockets[@]}" 2>/dev/null || true
+            systemctl --user try-restart xdg-desktop-portal.service \
+                2>/dev/null || true
             ;;
         rs)
             systemctl --user try-restart "${services[@]}" 2>/dev/null || true
+            systemctl --user try-restart xdg-desktop-portal.service \
+                2>/dev/null || true
             ;;
         st)
             for u in "${sockets[@]}" "${services[@]}"; do
