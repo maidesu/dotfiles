@@ -342,7 +342,7 @@ fi
 ### /PYENV ###
 EOF'
 
-    # Install / update pyenv via pyenv.run (pinned), then install requested Pythons + Poetry
+    # Install the latest stable pyenv release, then install requested Pythons + Poetry
     local tmp="/tmp/step_python.${TARGET_USER}.$$"
     cat >"$tmp" <<'EOS'
 set -euo pipefail
@@ -350,14 +350,61 @@ set -euo pipefail
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$HOME/.local/bin:$PATH"
 
-# pin pyenv version
-export PYENV_GIT_TAG="$(curl -fsSL https://api.github.com/repos/pyenv/pyenv/releases/latest | jq -r .tag_name)"
+latest_pyenv_tag="$(
+  git ls-remote --tags https://github.com/pyenv/pyenv.git 'v*' \
+    | awk '$2 !~ /\^\{\}$/ {
+        sub("refs/tags/", "", $2)
+        if ($2 ~ /^v[0-9]+\.[0-9]+\.[0-9]+$/) print $2
+      }' \
+    | sort -V \
+    | tail -n1
+)"
+
+if [[ -z "$latest_pyenv_tag" ]]; then
+  echo "Could not determine the latest stable pyenv release." >&2
+  exit 1
+fi
 
 if [[ ! -d "$PYENV_ROOT" ]]; then
-  curl -fsSL https://pyenv.run | bash
+  curl -fsSL https://pyenv.run | env PYENV_GIT_TAG="$latest_pyenv_tag" bash
 else
-  # already installed: update in a controlled way
-  (cd "$PYENV_ROOT" && git fetch --tags && git checkout "$PYENV_GIT_TAG") || true
+  if [[ ! -d "$PYENV_ROOT/.git" ]]; then
+    echo "$PYENV_ROOT exists but is not a Git checkout." >&2
+    exit 1
+  fi
+
+  if [[ -n "$(git -C "$PYENV_ROOT" status --porcelain --untracked-files=no)" ]]; then
+    echo "$PYENV_ROOT has local changes; refusing to update it." >&2
+    exit 1
+  fi
+
+  current_tag="$(git -C "$PYENV_ROOT" describe --tags --exact-match 2>/dev/null || true)"
+  if [[ "$current_tag" != "$latest_pyenv_tag" ]]; then
+    echo "Updating pyenv from ${current_tag:-unknown revision} to $latest_pyenv_tag..."
+    git -C "$PYENV_ROOT" fetch --depth=1 origin tag "$latest_pyenv_tag"
+    git -C "$PYENV_ROOT" checkout --detach "$latest_pyenv_tag"
+  else
+    echo "pyenv is already at $latest_pyenv_tag."
+  fi
+
+  # pyenv-update only supports branch checkouts, so update plugin repositories directly.
+  for plugin in "$PYENV_ROOT"/plugins/*; do
+    [[ -d "$plugin/.git" ]] || continue
+    if [[ -n "$(git -C "$plugin" status --porcelain --untracked-files=no)" ]]; then
+      echo "$plugin has local changes; refusing to update it." >&2
+      exit 1
+    fi
+
+    branch="$(git -C "$plugin" symbolic-ref --quiet --short HEAD || true)"
+    if [[ "$branch" != master && "$branch" != main ]]; then
+      echo "$plugin is not on a supported update branch." >&2
+      exit 1
+    fi
+
+    echo "Updating $plugin..."
+    git -C "$plugin" fetch --tags origin "$branch"
+    git -C "$plugin" merge --ff-only "origin/$branch"
+  done
 fi
 
 # Ensure pyenv is active in this shell
@@ -385,7 +432,7 @@ for minor in 3.10 3.11 3.12 3.13 3.14; do
 done
 
 # Set default (global) python
-default_minor="3.13"
+default_minor="3.14"
 default="$(
   printf '%s\n' "$available_versions" \
     | grep -E "^${default_minor}\.[0-9]+$" \
