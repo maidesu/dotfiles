@@ -367,45 +367,45 @@ fi
 
 if [[ ! -d "$PYENV_ROOT" ]]; then
   curl -fsSL https://pyenv.run | env PYENV_GIT_TAG="$latest_pyenv_tag" bash
-else
-  if [[ ! -d "$PYENV_ROOT/.git" ]]; then
-    echo "$PYENV_ROOT exists but is not a Git checkout." >&2
-    exit 1
-  fi
-
-  if [[ -n "$(git -C "$PYENV_ROOT" status --porcelain --untracked-files=no)" ]]; then
-    echo "$PYENV_ROOT has local changes; refusing to update it." >&2
-    exit 1
-  fi
-
-  current_tag="$(git -C "$PYENV_ROOT" describe --tags --exact-match 2>/dev/null || true)"
-  if [[ "$current_tag" != "$latest_pyenv_tag" ]]; then
-    echo "Updating pyenv from ${current_tag:-unknown revision} to $latest_pyenv_tag..."
-    git -C "$PYENV_ROOT" fetch --depth=1 origin tag "$latest_pyenv_tag"
-    git -C "$PYENV_ROOT" checkout --detach "$latest_pyenv_tag"
-  else
-    echo "pyenv is already at $latest_pyenv_tag."
-  fi
-
-  # pyenv-update only supports branch checkouts, so update plugin repositories directly.
-  for plugin in "$PYENV_ROOT"/plugins/*; do
-    [[ -d "$plugin/.git" ]] || continue
-    if [[ -n "$(git -C "$plugin" status --porcelain --untracked-files=no)" ]]; then
-      echo "$plugin has local changes; refusing to update it." >&2
-      exit 1
-    fi
-
-    branch="$(git -C "$plugin" symbolic-ref --quiet --short HEAD || true)"
-    if [[ "$branch" != master && "$branch" != main ]]; then
-      echo "$plugin is not on a supported update branch." >&2
-      exit 1
-    fi
-
-    echo "Updating $plugin..."
-    git -C "$plugin" fetch --tags origin "$branch"
-    git -C "$plugin" merge --ff-only "origin/$branch"
-  done
 fi
+
+if [[ ! -d "$PYENV_ROOT/.git" ]]; then
+  echo "$PYENV_ROOT exists but is not a Git checkout." >&2
+  exit 1
+fi
+
+if [[ -n "$(git -C "$PYENV_ROOT" status --porcelain --untracked-files=no)" ]]; then
+  echo "$PYENV_ROOT has local changes; refusing to update it." >&2
+  exit 1
+fi
+
+current_tag="$(git -C "$PYENV_ROOT" describe --tags --exact-match 2>/dev/null || true)"
+if [[ "$current_tag" != "$latest_pyenv_tag" ]]; then
+  echo "Updating pyenv from ${current_tag:-unknown revision} to $latest_pyenv_tag..."
+  git -C "$PYENV_ROOT" fetch --depth=1 origin tag "$latest_pyenv_tag"
+  git -C "$PYENV_ROOT" checkout --detach "$latest_pyenv_tag"
+else
+  echo "pyenv is already at $latest_pyenv_tag."
+fi
+
+# pyenv-update only supports branch checkouts, so update plugin repositories directly.
+for plugin in "$PYENV_ROOT"/plugins/*; do
+  [[ -d "$plugin/.git" ]] || continue
+  if [[ -n "$(git -C "$plugin" status --porcelain --untracked-files=no)" ]]; then
+    echo "$plugin has local changes; refusing to update it." >&2
+    exit 1
+  fi
+
+  branch="$(git -C "$plugin" symbolic-ref --quiet --short HEAD || true)"
+  if [[ "$branch" != master && "$branch" != main ]]; then
+    echo "$plugin is not on a supported update branch." >&2
+    exit 1
+  fi
+
+  echo "Updating $plugin..."
+  git -C "$plugin" fetch --tags origin "$branch"
+  git -C "$plugin" merge --ff-only "origin/$branch"
+done
 
 # Ensure pyenv is active in this shell
 export PATH="$PYENV_ROOT/bin:$HOME/.local/bin:$PATH"
@@ -442,9 +442,12 @@ default="$(
 pyenv global "$default"
 pyenv rehash
 
-# Install Poetry using the default python
+# Install or update Poetry using the default python
 python -m pip install --upgrade pip setuptools wheel
-curl -sSL https://install.python-poetry.org | python -
+if ! command -v poetry >/dev/null 2>&1; then
+  curl -sSL https://install.python-poetry.org | python -
+fi
+poetry self update --no-interaction
 pyenv rehash
 
 # Sanity prints
