@@ -749,8 +749,11 @@ main()
         osu)
             step_appimages
             ;;
+        py)
+            step_python
+            ;;
         *)
-            die "Unknown preset '$preset'. Use: default, all, osu."
+            die "Unknown preset '$preset'. Use: default, all, osu, py."
             ;;
     esac
 }
