@@ -46,9 +46,9 @@ pcm.hw_e30 {
     card E30
     device 0
     nonblock false
-    rate 44100
-    format S32_LE
-    channels 2
+    #rate 44100
+    #format S32_LE
+    #channels 2
 }
 
 pcm.hw_board {
@@ -56,9 +56,9 @@ pcm.hw_board {
     card Generic
     device 0
     nonblock false
-    rate 44100
-    format S32_LE
-    channels 2
+    #rate 44100
+    #format S32_LE
+    #channels 2
 }
 
 pcm.nullsink {
