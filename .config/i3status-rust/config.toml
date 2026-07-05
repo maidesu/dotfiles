@@ -23,6 +23,11 @@ format = "RAM: $mem_used.eng(w:4,p:Gi) / $mem_total.eng(w:4,p:Gi)"
 format_alt = "SWP: $swap_used.eng(w:4,p:Gi) / $swap_total.eng(w:4,p:Gi)"
 
 [[block]]
+block = "nvidia_gpu"
+interval = 5
+format = "GPU: $utilization.eng(w:3) $memory.eng(w:5,p:Mi)"
+
+[[block]]
 block = "disk_space"
 interval = 20
 path = "/"
