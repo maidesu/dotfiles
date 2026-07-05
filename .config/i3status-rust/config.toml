@@ -7,6 +7,22 @@ theme = "plain"
 separator = " | "
 
 [[block]]
+block = "net"
+device = "^(wl|wlan|wlp|wlo)"
+interval = 5
+format = "WiFi: $ssid.str(max_w:12) $signal_strength.eng(w:3) $speed_down.eng(w:5,p:K)↓ $speed_up.eng(w:5,p:K)↑"
+inactive_format = "WiFi: down"
+missing_format = ""
+
+[[block]]
+block = "net"
+device = "^(en|eth)"
+interval = 10
+format = "Eth: $speed_down.eng(w:5,p:K)↓ $speed_up.eng(w:5,p:K)↑"
+inactive_format = "Eth: down"
+missing_format = ""
+
+[[block]]
 block = "cpu"
 interval = 5
 format = "CPU: $barchart $utilization.eng(w:3)"
