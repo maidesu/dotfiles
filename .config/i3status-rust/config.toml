@@ -78,20 +78,20 @@ missing_format = ""
 block = "battery"
 model = "Wacom Intuos Pro S"
 interval = 15
-format = "Tab: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-charging_format = "Tab: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-full_format = "Tab: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-not_charging_format = "Tab: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+charging_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+full_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+not_charging_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
 missing_format = ""
 
 [[block]]
 block = "battery"
 model = "PRO X2 SUPERSTRIKE"
 interval = 15
-format = "Mse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-charging_format = "Mse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-full_format = "Mse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-not_charging_format = "Mse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+charging_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+full_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+not_charging_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
 missing_format = ""
 
 [[block]]
