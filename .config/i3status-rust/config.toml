@@ -7,6 +7,22 @@ theme = "plain"
 separator = " | "
 
 [[block]]
+block = "cpu"
+interval = 5
+format = "CPU: $barchart $utilization.eng(w:3)"
+
+[[block]]
+block = "load"
+interval = 5
+format = "Load: $1m.eng(w:4)"
+
+[[block]]
+block = "memory"
+interval = 5
+format = "RAM: $mem_used.eng(w:4,p:Gi) / $mem_total.eng(w:4,p:Gi)"
+format_alt = "SWP: $swap_used.eng(w:4,p:Gi) / $swap_total.eng(w:4,p:Gi)"
+
+[[block]]
 block = "battery"
 device = "BAT0"
 interval = 15
