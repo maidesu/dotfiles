@@ -7,6 +7,27 @@ theme = "plain"
 separator = " | "
 
 [[block]]
+block = "custom"
+command = '''
+show="$(bluetoothctl show 2>/dev/null)"
+if [ -z "$show" ]; then
+    printf '{"text":"none"}\n'
+elif ! printf "%s\n" "$show" | grep -q "Powered: yes"; then
+    printf '{"text":"down"}\n'
+else
+    count="$(bluetoothctl devices Connected 2>/dev/null | awk 'END { print NR }')"
+    if [ "$count" -gt 0 ]; then
+        printf '{"text":"%s"}\n' "$count"
+    else
+        printf '{"text":"up"}\n'
+    fi
+fi
+'''
+json = true
+interval = 5
+format = "BT: $text.str(width:4)"
+
+[[block]]
 block = "net"
 device = "^(wl|wlan|wlp|wlo)"
 interval = 5
