@@ -23,6 +23,27 @@ format = "RAM: $mem_used.eng(w:4,p:Gi) / $mem_total.eng(w:4,p:Gi)"
 format_alt = "SWP: $swap_used.eng(w:4,p:Gi) / $swap_total.eng(w:4,p:Gi)"
 
 [[block]]
+block = "disk_space"
+interval = 20
+path = "/"
+info_type = "available"
+format = "/: $available.eng(w:4,p:Gi)"
+
+[[block]]
+block = "disk_space"
+interval = 20
+path = "/home"
+info_type = "available"
+format = "/home: $available.eng(w:4,p:Gi)"
+
+[[block]]
+block = "disk_space"
+interval = 20
+path = "/var"
+info_type = "available"
+format = "/var: $available.eng(w:4,p:Gi)"
+
+[[block]]
 block = "battery"
 device = "BAT0"
 interval = 15
