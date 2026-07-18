@@ -261,7 +261,7 @@ step_disable_wol()
 Type=ether
 
 [Link]
-WakeOnLan=no
+WakeOnLan=off
 EOF
 }
 
