@@ -51,18 +51,20 @@ run_as_user()
 
 step_apt_sources()
 {
+    apt install -y ca-certificates
+
     mv -f /etc/apt/sources.list /etc/apt/sources.list.bak || true
     touch /etc/apt/sources.list~
 
     cat >/etc/apt/sources.list.d/debian.sources <<EOF
 Types: deb deb-src
-URIs: http://deb.debian.org/debian/
+URIs: https://deb.debian.org/debian
 Suites: $CODENAME ${CODENAME}-updates
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
 Types: deb deb-src
-URIs: http://security.debian.org/debian-security/
+URIs: https://security.debian.org/debian-security
 Suites: ${CODENAME}-security
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
