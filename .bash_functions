@@ -87,7 +87,8 @@ u()
     command -v flatpak >/dev/null 2>&1 &&
         run_update sudo flatpak update
 
-    if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    if ! command -v nvm >/dev/null 2>&1 &&
+        [ -s "$HOME/.nvm/nvm.sh" ]; then
         . "$HOME/.nvm/nvm.sh"
     fi
     if command -v nvm >/dev/null 2>&1; then
