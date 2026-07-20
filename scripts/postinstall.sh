@@ -146,6 +146,7 @@ step_base_packages()
         smartmontools \
         nvme-cli \
         lm-sensors \
+        libsensors-dev \
         lshw \
         usbutils \
         pciutils \
@@ -564,7 +565,6 @@ step_app_packages()
 {
     apt install -y \
         fastfetch \
-        nvidia-cuda-toolkit \
         alsa-utils \
         alsa-tools \
         ffmpeg \
