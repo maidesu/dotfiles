@@ -245,6 +245,7 @@ step_i3()
         lightdm-gtk-greeter \
         lightdm-gtk-greeter-settings \
         mate-polkit \
+        pipewire-audio \
         pavucontrol \
         xdg-desktop-portal \
         xdg-desktop-portal-gtk \
