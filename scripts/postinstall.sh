@@ -117,6 +117,7 @@ step_base_packages()
         llvm \
         vim \
         htop \
+        btop \
         ethtool \
         dos2unix \
         7zip \
@@ -129,7 +130,29 @@ step_base_packages()
         ripgrep \
         dnsutils \
         traceroute \
+        mtr-tiny \
+        whois \
+        nmap \
+        tcpdump \
         iproute2 \
+        rfkill \
+        lsof \
+        strace \
+        iotop \
+        pv \
+        tree \
+        ncdu \
+        plocate \
+        smartmontools \
+        nvme-cli \
+        lm-sensors \
+        lshw \
+        usbutils \
+        pciutils \
+        dmidecode \
+        attr \
+        quota \
+        evtest \
         apt-file \
         apt-utils \
         xxd
