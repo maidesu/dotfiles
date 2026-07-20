@@ -7,4 +7,3 @@
 *.bmp diff=xxd
 *.pdf diff=xxd
 *.db  diff=xxd
-*.bak diff=xxd
