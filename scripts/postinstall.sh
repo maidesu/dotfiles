@@ -299,6 +299,34 @@ GRUB_DISABLE_OS_PROBER=true
 EOF
 }
 
+step_swapfile()
+{
+    local swapfile="/swapfile"
+    local swap_size="4G"
+
+    if grep -q "^$swapfile[[:space:]]" /proc/swaps; then
+        echo "$swapfile is already active."
+    else
+        if [[ -e "$swapfile" ]]; then
+            [[ -f "$swapfile" && ! -L "$swapfile" ]] ||
+                die "$swapfile exists but is not a regular file."
+            [[ "$(blkid -p -s TYPE -o value "$swapfile" 2>/dev/null)" == "swap" ]] ||
+                die "$swapfile exists but is not initialized as swap."
+            chmod 0600 "$swapfile"
+        else
+            fallocate -l "$swap_size" "$swapfile"
+            chmod 0600 "$swapfile"
+            mkswap "$swapfile"
+        fi
+
+        swapon "$swapfile"
+    fi
+
+    if ! grep -Eq "^[[:space:]]*$swapfile[[:space:]]" /etc/fstab; then
+        printf "%s none swap sw 0 0\n" "$swapfile" >>/etc/fstab
+    fi
+}
+
 step_mok_pub()
 {
     if [[ -f /var/lib/dkms/mok.pub ]]; then
@@ -690,6 +718,8 @@ main()
             step_gpg
             step_keyring
 
+            step_swapfile
+
             step_disable_wol
 
             step_disable_wayland
@@ -724,6 +754,8 @@ main()
             step_base_packages
             step_gpg
             step_keyring
+
+            step_swapfile
 
             step_r8125
             step_disable_wol
