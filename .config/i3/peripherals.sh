@@ -63,8 +63,8 @@ xsetwacom --set "Wacom Intuos Pro S Pen stylus" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" RawSample 1 || true
 xsetwacom --set "Wacom Intuos Pro S Pad pad" RawSample 1 || true
 
-xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 6304 3546 || true
-xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 6304 3546 || true
+xsetwacom --set "Wacom Intuos Pro S Pen stylus" Area 0 0 6400 3600 || true
+xsetwacom --set "Wacom Intuos Pro S Pen eraser" Area 0 0 6400 3600 || true
 
 xsetwacom --set "Wacom Intuos Pro S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" MapToOutput HEAD-0 || true
@@ -78,8 +78,8 @@ xsetwacom --set "Wacom One by Wacom S Pen eraser" Suppress 0 || true
 xsetwacom --set "Wacom One by Wacom S Pen stylus" RawSample 1 || true
 xsetwacom --set "Wacom One by Wacom S Pen eraser" RawSample 1 || true
 
-xsetwacom --set "Wacom One by Wacom S Pen stylus" Area 12048 7727 15200 9500 || true
-xsetwacom --set "Wacom One by Wacom S Pen eraser" Area 12048 7727 15200 9500 || true
+xsetwacom --set "Wacom One by Wacom S Pen stylus" Area 12000 7700 15200 9500 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" Area 12000 7700 15200 9500 || true
 
 xsetwacom --set "Wacom One by Wacom S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom One by Wacom S Pen eraser" MapToOutput HEAD-0 || true
