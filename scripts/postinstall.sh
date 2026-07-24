@@ -324,6 +324,14 @@ GRUB_DISABLE_OS_PROBER=true
 EOF
 }
 
+step_preempt_full()
+{
+    install -d -m 0755 /etc/default/grub.d
+    cat >/etc/default/grub.d/02-preempt-full.cfg <<'EOF'
+GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT:+${GRUB_CMDLINE_LINUX_DEFAULT} }preempt=full"
+EOF
+}
+
 step_swapfile()
 {
     local swapfile="/swapfile"
@@ -751,6 +759,7 @@ main()
             step_i3
 
             step_skip_grub
+            step_preempt_full
 
             step_nvidia_driver
             step_mok_pub
@@ -789,6 +798,7 @@ main()
             step_i3
 
             step_skip_grub
+            step_preempt_full
 
             step_nvidia_driver
             step_mok_pub
