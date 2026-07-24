@@ -744,6 +744,22 @@ chmod 0755 "$HOME/.local/bin/osu"
 '
 }
 
+step_kmsdrm_launcher()
+{
+    local launcher="$TARGET_HOME/.local/bin/osu"
+
+    [[ -f "$launcher" ]] || die "Missing osu launcher: $launcher"
+
+    run_as_user "sed -i \
+        -e 's/^export SDL_VIDEO_DRIVER=x11$/export SDL_VIDEO_DRIVER=kmsdrm/' \
+        -e '/^export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1$/c\\
+export SDL_VIDEO_DISPLAY_PRIORITY=DP-3\\
+export SDL_KMSDRM_ATOMIC=0\\
+export SDL_VIDEO_DOUBLE_BUFFER=0' \
+        -e 's/^export SDL_PEN_MOUSE_EVENTS=1$/export SDL_PEN_MOUSE_EVENTS=0/' \
+        '$launcher'"
+}
+
 step_realtime_priority()
 {
     install -d -m 0755 /etc/security/limits.d
@@ -855,6 +871,7 @@ main()
             step_appimages
 
             step_gamemode
+            step_kmsdrm_launcher
             step_realtime_priority
 
             finalize
@@ -862,11 +879,15 @@ main()
         osu)
             step_appimages
             ;;
+        kmsdrm)
+            step_gamemode
+            step_kmsdrm_launcher
+            ;;
         py)
             step_python
             ;;
         *)
-            die "Unknown preset '$preset'. Use: default, all, osu, py."
+            die "Unknown preset '$preset'. Use: default, all, osu, kmsdrm, py."
             ;;
     esac
 }
