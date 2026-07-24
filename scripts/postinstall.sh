@@ -332,6 +332,27 @@ GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT:+${GRUB_CMDLINE_LINUX_D
 EOF
 }
 
+step_peripheral_read_rules()
+{
+    install -d -m 0755 /etc/udev/rules.d
+    cat >/etc/udev/rules.d/70-osu-kms-input.rules <<'EOF'
+# Wooting 60HE v2 keyboard
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="31e3", ATTRS{idProduct}=="1342", TAG+="uaccess"
+
+# Logitech X2 SUPERSTRIKE mouse
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c54d", TAG+="uaccess"
+
+# Wacom PTK-470
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", TAG+="uaccess"
+EOF
+
+    udevadm control --reload-rules
+    udevadm trigger --action=add --subsystem-match=input
+    udevadm trigger --action=add --subsystem-match=hidraw
+    udevadm settle
+}
+
 step_swapfile()
 {
     local swapfile="/swapfile"
@@ -799,6 +820,8 @@ main()
 
             step_skip_grub
             step_preempt_full
+
+            step_peripheral_read_rules
 
             step_nvidia_driver
             step_mok_pub
