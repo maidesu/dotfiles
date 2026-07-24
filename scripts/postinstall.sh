@@ -339,6 +339,9 @@ step_peripheral_read_rules()
 # Wooting 60HE v2 keyboard
 SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="31e3", ATTRS{idProduct}=="1342", TAG+="uaccess"
 
+# Wooting UwU keypad
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="31e3", ATTRS{idProduct}=="1512", TAG+="uaccess"
+
 # Logitech X2 SUPERSTRIKE mouse
 SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c54d", TAG+="uaccess"
 
