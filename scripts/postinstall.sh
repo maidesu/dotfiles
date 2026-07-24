@@ -356,6 +356,37 @@ EOF
     udevadm settle
 }
 
+step_sdl_tablet_mouse_rule()
+{
+    install -d -m 0755 /etc/udev/rules.d
+    cat >/etc/udev/rules.d/71-sdl-tablet-mouse.rules <<'EOF'
+# Expose only the PTK-470 pen event node as an absolute mouse to SDL evdev.
+# The tablet pad also has ID_INPUT_TABLET=1, so explicitly exclude it.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{ID_INPUT_MOUSE}="1", TAG+="uaccess"
+
+# Ignore the kernel mousedev compatibility streams. They duplicate the pen
+# event node and translate BTN_TOUCH into a mouse button.
+SUBSYSTEM=="input", KERNEL=="mouse*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_MOUSE}="0", ENV{ID_INPUT_JOYSTICK}="1"
+EOF
+
+    udevadm control --reload-rules
+    udevadm trigger --action=add --subsystem-match=input
+    udevadm settle
+}
+
+step_tablet_area_rule()
+{
+    install -d -m 0755 /etc/udev/rules.d
+    cat >/etc/udev/rules.d/72-tablet-area.rules <<'EOF'
+# Advertise a 32x18 mm area at 200 units/mm on the Wacom PTK-470 pen.
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:6400:200:0:0", ENV{EVDEV_ABS_01}="0:3600:200:0:0", RUN{builtin}+="keyboard"
+EOF
+
+    udevadm control --reload-rules
+    udevadm trigger --action=add --subsystem-match=input
+    udevadm settle
+}
+
 step_swapfile()
 {
     local swapfile="/swapfile"
@@ -854,6 +885,8 @@ main()
             step_preempt_full
 
             step_peripheral_read_rules
+            step_sdl_tablet_mouse_rule
+            step_tablet_area_rule
 
             step_nvidia_driver
             step_mok_pub
@@ -880,6 +913,9 @@ main()
             step_appimages
             ;;
         kmsdrm)
+            step_sdl_tablet_mouse_rule
+            step_tablet_area_rule
+
             step_gamemode
             step_kmsdrm_launcher
             ;;
