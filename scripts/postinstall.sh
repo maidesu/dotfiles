@@ -741,6 +741,15 @@ chmod 0755 "$HOME/.local/bin/osu"
 '
 }
 
+step_realtime_priority()
+{
+    install -d -m 0755 /etc/security/limits.d
+    cat >/etc/security/limits.d/90-realtime-priority.conf <<EOF
+$TARGET_USER - rtprio 2
+EOF
+    chmod 0644 /etc/security/limits.d/90-realtime-priority.conf
+}
+
 finalize()
 {
     systemctl daemon-reload || true
@@ -801,6 +810,7 @@ main()
             step_appimages
 
             step_gamemode
+            step_realtime_priority
 
             finalize
             ;;
@@ -842,6 +852,7 @@ main()
             step_appimages
 
             step_gamemode
+            step_realtime_priority
 
             finalize
             ;;
