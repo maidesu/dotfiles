@@ -94,4 +94,4 @@ nvidia-settings \
   --assign GPUPowerMizerMode=1
 
 log "applying wallpapers"
-feh --bg-fill --randomize ~/Downloads/desktopwallpaper/* || true
+feh --bg-fill --randomize "$HOME"/.local/share/backgrounds/* || true
