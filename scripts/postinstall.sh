@@ -261,6 +261,19 @@ step_i3()
         systemctl enable lightdm.service || true
     fi
 
+    install -d -m 0755 /etc/lightdm/lightdm-gtk-greeter.conf.d
+
+    cat >/etc/lightdm/lightdm-gtk-greeter.conf.d/10-background.conf <<'EOF'
+[greeter]
+background=#000000
+user-background=false
+active-monitor=DP-4
+
+[monitor: DP-4]
+background=/usr/local/share/lightdm/background.png
+user-background=false
+EOF
+
     run_as_user 'cat >"$HOME/.xsession" <<'"'"'EOF'"'"'
 #!/bin/sh
 [ -f "$HOME/.profile" ] && . "$HOME/.profile"
