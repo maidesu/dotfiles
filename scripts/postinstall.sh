@@ -391,8 +391,8 @@ step_tablet_area_rule()
 {
     install -d -m 0755 /etc/udev/rules.d
     cat >/etc/udev/rules.d/72-tablet-area.rules <<'EOF'
-# Advertise a 32x18 mm area at 200 units/mm on the Wacom PTK-470 pen.
-ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:6400:200:0:0", ENV{EVDEV_ABS_01}="0:3600:200:0:0", RUN{builtin}+="keyboard"
+# Advertise an 8400x4725-unit area at 200 units/mm on the Wacom PTK-470 pen.
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:8400:200:0:0", ENV{EVDEV_ABS_01}="0:4725:200:0:0", RUN{builtin}+="keyboard"
 EOF
 
     udevadm control --reload-rules
