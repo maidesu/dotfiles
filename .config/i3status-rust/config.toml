@@ -31,7 +31,7 @@ format = "BT: $text.str(width:4)"
 block = "net"
 device = "^(wl|wlan|wlp|wlo)"
 interval = 5
-format = "WiFi: $ssid.str(max_w:12) $signal_strength.eng(w:3) $speed_down.eng(w:5,p:K)↓ $speed_up.eng(w:5,p:K)↑"
+format = "WiFi: $ssid.str(max_w:12) $signal_strength.eng(w:3,u:%) $speed_down.eng(w:5,u:b,p:K)↓ $speed_up.eng(w:5,u:b,p:K)↑"
 inactive_format = "WiFi: down"
 missing_format = ""
 
@@ -39,14 +39,14 @@ missing_format = ""
 block = "net"
 device = "^(en|eth)"
 interval = 10
-format = "Eth: $speed_down.eng(w:5,p:K)↓ $speed_up.eng(w:5,p:K)↑"
+format = "Eth: $speed_down.eng(w:5,u:b,p:K)↓ $speed_up.eng(w:5,u:b,p:K)↑"
 inactive_format = "Eth: down"
 missing_format = ""
 
 [[block]]
 block = "cpu"
 interval = 5
-format = "CPU: $barchart $utilization.eng(w:3)"
+format = "CPU: $barchart $utilization.eng(w:3,u:%)"
 
 [[block]]
 block = "load"
@@ -56,63 +56,63 @@ format = "Load: $1m.eng(w:4)"
 [[block]]
 block = "memory"
 interval = 5
-format = "RAM: $mem_used.eng(w:4,p:Gi) / $mem_total.eng(w:4,p:Gi)"
-format_alt = "SWP: $swap_used.eng(w:4,p:Gi) / $swap_total.eng(w:4,p:Gi)"
+format = "RAM: $mem_used.eng(w:4,u:B,p:Gi) / $mem_total.eng(w:4,u:B,p:Gi)"
+format_alt = "SWP: $swap_used.eng(w:4,u:B,p:Gi) / $swap_total.eng(w:4,u:B,p:Gi)"
 
 [[block]]
 block = "nvidia_gpu"
 interval = 5
-format = "GPU: $utilization.eng(w:3) $memory.eng(w:5,p:Mi)"
+format = "GPU: $utilization.eng(w:3,u:%) $memory.eng(w:5,u:B,p:Mi)"
 
 [[block]]
 block = "disk_space"
 interval = 20
 path = "/"
 info_type = "available"
-format = "/: $available.eng(w:4,p:Gi)"
+format = "/: $available.eng(w:4,u:B,p:Gi)"
 
 [[block]]
 block = "disk_space"
 interval = 20
 path = "/home"
 info_type = "available"
-format = "/home: $available.eng(w:4,p:Gi)"
+format = "/home: $available.eng(w:4,u:B,p:Gi)"
 
 [[block]]
 block = "disk_space"
 interval = 20
 path = "/var"
 info_type = "available"
-format = "/var: $available.eng(w:4,p:Gi)"
+format = "/var: $available.eng(w:4,u:B,p:Gi)"
 
 [[block]]
 block = "battery"
 device = "BAT0"
 interval = 15
-format = "Bat: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-charging_format = "Bat: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-full_format = "Bat: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-not_charging_format = "Bat: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+format = "Bat: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+charging_format = "Bat: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+full_format = "Bat: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+not_charging_format = "Bat: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
 missing_format = ""
 
 [[block]]
 block = "battery"
 model = "Wacom Intuos Pro S"
 interval = 15
-format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-charging_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-full_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-not_charging_format = "Tablet: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+format = "Tablet: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+charging_format = "Tablet: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+full_format = "Tablet: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+not_charging_format = "Tablet: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
 missing_format = ""
 
 [[block]]
 block = "battery"
 model = "PRO X2 SUPERSTRIKE"
 interval = 15
-format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-charging_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-full_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
-not_charging_format = "Mouse: $percentage.eng(w:3){ $time_remaining.duration(hms:true, min_unit:m)|}"
+format = "Mouse: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+charging_format = "Mouse: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+full_format = "Mouse: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
+not_charging_format = "Mouse: $percentage.eng(w:3,u:%){ $time_remaining.duration(hms:true, min_unit:m)|}"
 missing_format = ""
 
 [[block]]
@@ -120,7 +120,7 @@ block = "sound"
 driver = "auto"
 step_width = 5
 max_vol = 150
-format = "Vol: {$volume.eng(w:3)|mute}"
+format = "Vol: {$volume.eng(w:3,u:%)|mute}"
 
 [[block]]
 block = "time"
