@@ -292,6 +292,31 @@ fi
 '
 }
 
+step_noto_color_emoji()
+{
+    apt install -y ca-certificates curl fontconfig fonts-symbola
+
+    local font_url="https://raw.githubusercontent.com/googlefonts/noto-emoji/main/fonts/Noto-COLRv1.ttf"
+    local font_dir="$TARGET_HOME/.local/share/fonts"
+    local target_group
+    local tmp_dir
+
+    target_group="$(id -gn "$TARGET_USER")"
+    tmp_dir="$(mktemp -d /tmp/noto-color-emoji.XXXXXX)"
+
+    curl -fL --retry 3 --retry-delay 1 \
+        "$font_url" \
+        -o "$tmp_dir/Noto-COLRv1.ttf"
+
+    install -d -m 0755 -o "$TARGET_USER" -g "$target_group" \
+        "$font_dir"
+    install -m 0644 -o "$TARGET_USER" -g "$target_group" \
+        "$tmp_dir/Noto-COLRv1.ttf" "$font_dir/Noto-COLRv1.ttf"
+
+    sudo -u "$TARGET_USER" -H fc-cache -f "$font_dir"
+    rm -rf "$tmp_dir"
+}
+
 step_disable_wol()
 {
     install -d -m 0755 /etc/systemd/network
@@ -853,6 +878,7 @@ main()
             step_disable_wayland
             step_power_profile
             step_i3
+            step_noto_color_emoji
 
             step_skip_grub
             step_preempt_full
@@ -893,6 +919,7 @@ main()
             step_disable_wayland
             step_power_profile
             step_i3
+            step_noto_color_emoji
 
             step_skip_grub
             step_preempt_full
