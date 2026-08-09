@@ -6,6 +6,14 @@ pcm_slave.e30-osu {
     period_size 16
     buffer_size 192
 }
+pcm_slave.e30-cs2 {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 128
+    buffer_size 384
+}
 pcm_slave.e30-safe {
     pcm "hw:CARD=E30,DEV=0"
     rate 44100
@@ -71,12 +79,24 @@ pcm.osu {
     ipc_perm 0600
     slave board-osu
 }
-
 pcm.cs2 {
     type dmix
     ipc_key 6969
     ipc_perm 0600
     slave board-cs2
+}
+
+pcm.osu-e30 {
+    type dmix
+    ipc_key 2727
+    ipc_perm 0600
+    slave e30-osu
+}
+pcm.cs2-e30 {
+    type dmix
+    ipc_key 9696
+    ipc_perm 0600
+    slave e30-cs2
 }
 
 
