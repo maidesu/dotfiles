@@ -795,15 +795,30 @@ unset SDL_AUDIODRIVER
 
 export OSU_DISABLE_ERROR_REPORTING=1
 
-export SDL_VIDEO_DRIVER=x11
-export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1
+# x11 under i3, kmsdrm on a VT
+if [ -n "$DISPLAY" ]; then
+    export SDL_VIDEO_DRIVER=x11
+    export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1
 
-export SDL_PEN_MOUSE_EVENTS=1
+    export SDL_PEN_MOUSE_EVENTS=1
+else
+    export SDL_VIDEO_DRIVER=kmsdrm
+    export SDL_VIDEO_DISPLAY_PRIORITY=DP-3
+    export SDL_KMSDRM_ATOMIC=0
+    export SDL_VIDEO_DOUBLE_BUFFER=0
+
+    export SDL_PEN_MOUSE_EVENTS=0
+fi
+
 export SDL_PEN_TOUCH_EVENTS=0
 
+#export SDL_VIDEO_DRIVER=offscreen
+
 export SDL_AUDIO_DRIVER=alsa
+#export SDL_AUDIO_DRIVER=dummy
 
 #export MAI_ALSA_PCM=osu
+#export MAI_ALSA_PCM=osu-e30
 export MAI_ALSA_PCM=hw_board
 export OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-16
 #export MAI_ALSA_PCM=hw_e30
@@ -821,22 +836,6 @@ EOF
 
 chmod 0755 "$HOME/.local/bin/osu"
 '
-}
-
-step_kmsdrm_launcher()
-{
-    local launcher="$TARGET_HOME/.local/bin/osu"
-
-    [[ -f "$launcher" ]] || die "Missing osu launcher: $launcher"
-
-    run_as_user "sed -i \
-        -e 's/^export SDL_VIDEO_DRIVER=x11$/export SDL_VIDEO_DRIVER=kmsdrm/' \
-        -e '/^export SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR=1$/c\\
-export SDL_VIDEO_DISPLAY_PRIORITY=DP-3\\
-export SDL_KMSDRM_ATOMIC=0\\
-export SDL_VIDEO_DOUBLE_BUFFER=0' \
-        -e 's/^export SDL_PEN_MOUSE_EVENTS=1$/export SDL_PEN_MOUSE_EVENTS=0/' \
-        '$launcher'"
 }
 
 step_realtime_priority()
@@ -954,7 +953,6 @@ main()
             step_appimages
 
             step_gamemode
-            step_kmsdrm_launcher
             step_realtime_priority
 
             finalize
@@ -967,7 +965,6 @@ main()
             step_tablet_area_rule
 
             step_gamemode
-            step_kmsdrm_launcher
             ;;
         py)
             step_python
