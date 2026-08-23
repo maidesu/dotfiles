@@ -231,6 +231,7 @@ step_i3()
         i3-wm \
         i3blocks \
         i3lock \
+        suckless-tools \
         xorg \
         xserver-xorg \
         xterm \
@@ -280,6 +281,15 @@ EOF
 exec i3
 EOF
 chmod 0755 "$HOME/.xsession"
+
+mkdir -p "$HOME/.local/bin"
+cat >"$HOME/.local/bin/lmenu" <<'"'"'EOF'"'"'
+#!/bin/sh
+cmd=$(dmenu_path | dmenu "$@") || exit
+[ -n "$cmd" ] || exit
+exec setsid -f "${SHELL:-/bin/sh}" -c "$cmd" </dev/null >/dev/null 2>&1
+EOF
+chmod 0755 "$HOME/.local/bin/lmenu"
 
 mkdir -p "$HOME/.config/kitty"
 grep -q "^enable_audio_bell " "$HOME/.config/kitty/kitty.conf" 2>/dev/null \
