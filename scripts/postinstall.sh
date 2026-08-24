@@ -2,7 +2,6 @@
 set -euo pipefail
 
 LOG=/var/log/postinstall.log
-exec > >(tee -a "$LOG") 2>&1
 
 
 die()
@@ -870,6 +869,8 @@ main()
     local preset="${1:-default}"
 
     require_root
+    exec > >(tee -a "$LOG") 2>&1
+
     detect_os
     detect_user
 
