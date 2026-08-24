@@ -848,7 +848,7 @@ EOF
     chmod 0644 /etc/security/limits.d/90-realtime-priority.conf
 }
 
-finalize()
+step_finalize()
 {
     systemctl daemon-reload || true
 
@@ -913,7 +913,7 @@ main()
             step_gamemode
             step_realtime_priority
 
-            finalize
+            step_finalize
             ;;
         all)
             step_apt_sources
@@ -958,7 +958,7 @@ main()
             step_gamemode
             step_realtime_priority
 
-            finalize
+            step_finalize
             ;;
         osu)
             step_appimages
