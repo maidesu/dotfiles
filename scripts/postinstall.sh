@@ -817,12 +817,14 @@ export SDL_PEN_TOUCH_EVENTS=0
 export SDL_AUDIO_DRIVER=alsa
 #export SDL_AUDIO_DRIVER=dummy
 
-#export MAI_ALSA_PCM=osu
-#export MAI_ALSA_PCM=osu-e30
-export MAI_ALSA_PCM=hw_board
-export OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-16
-#export MAI_ALSA_PCM=hw_e30
-#export OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-64
+# audio target: 0 board (default), 1 e30, 2 dmix board, 3 dmix e30
+export MAI_ALSA_PCM=hw_board OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-16
+case "${1-}" in
+    0) shift ;;
+    1) export MAI_ALSA_PCM=hw_e30   OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-64; shift ;;
+    2) export MAI_ALSA_PCM=osu;     unset OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD; shift ;;
+    3) export MAI_ALSA_PCM=osu-e30; unset OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD; shift ;;
+esac
 
 export __GL_SYNC_TO_VBLANK=0
 export __GL_GSYNC_ALLOWED=0
