@@ -47,6 +47,17 @@ run_as_user()
     sudo -u "$TARGET_USER" -H bash -lc "$*"
 }
 
+list_steps()
+{
+    compgen -A function step_ | sed 's/^step_//' | sort
+}
+
+run_step()
+{
+    declare -F "step_$1" >/dev/null || die "Unknown step '$1'. Run '$0 list' for available steps."
+    "step_$1"
+}
+
 
 step_apt_sources()
 {
@@ -866,13 +877,27 @@ step_finalize()
 
 main()
 {
-    local preset="${1:-default}"
+    local mode=preset
+
+    case "${1-}" in
+        list)   list_steps; return 0 ;;
+        step)   shift; mode=step ;;
+        preset) shift ;;
+        *)      ;;  # Look it up as a preset later
+    esac
 
     require_root
     exec > >(tee -a "$LOG") 2>&1
 
     detect_os
     detect_user
+
+    if [[ $mode == step ]]; then
+        run_step "${1-}"
+        return 0
+    fi
+
+    local preset="${1:-default}"
 
     case "$preset" in
         default)
