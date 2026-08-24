@@ -805,17 +805,14 @@ else
     export SDL_VIDEO_DRIVER=kmsdrm
     export SDL_VIDEO_DISPLAY_PRIORITY=DP-3
     export SDL_KMSDRM_ATOMIC=0
-    export SDL_VIDEO_DOUBLE_BUFFER=0
+    export SDL_VIDEO_DOUBLE_BUFFER=1
 
     export SDL_PEN_MOUSE_EVENTS=0
 fi
 
 export SDL_PEN_TOUCH_EVENTS=0
 
-#export SDL_VIDEO_DRIVER=offscreen
-
 export SDL_AUDIO_DRIVER=alsa
-#export SDL_AUDIO_DRIVER=dummy
 
 # audio target: 0 board (default), 1 e30, 2 dmix board, 3 dmix e30
 export MAI_ALSA_PCM=hw_board OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=-16
@@ -832,6 +829,9 @@ export __GL_VRR_ALLOWED=0
 export __GL_MaxFramesAllowed=1
 export __GL_YIELD=NOTHING
 export __GL_THREADED_OPTIMIZATIONS=0
+
+#export SDL_VIDEO_DRIVER=offscreen
+#export SDL_AUDIO_DRIVER=dummy
 
 exec gamemoderun /usr/local/bin/osu "$@"
 EOF
