@@ -1,28 +1,3 @@
-pcm_slave.e30-osu {
-    pcm "hw:CARD=E30,DEV=0"
-    rate 44100
-    format S32_LE
-    channels 2
-    period_size 16
-    buffer_size 192
-}
-pcm_slave.e30-cs2 {
-    pcm "hw:CARD=E30,DEV=0"
-    rate 44100
-    format S32_LE
-    channels 2
-    period_size 128
-    buffer_size 384
-}
-pcm_slave.e30-safe {
-    pcm "hw:CARD=E30,DEV=0"
-    rate 44100
-    format S32_LE
-    channels 2
-    period_size 256
-    buffer_size 1024
-}
-
 pcm_slave.board-osu {
     pcm "hw:CARD=Generic,DEV=0"
     rate 44100
@@ -31,6 +6,7 @@ pcm_slave.board-osu {
     period_size 16
     buffer_size 64
 }
+
 pcm_slave.board-cs2 {
     pcm "hw:CARD=Generic,DEV=0"
     rate 44100
@@ -39,6 +15,7 @@ pcm_slave.board-cs2 {
     period_size 128
     buffer_size 384
 }
+
 pcm_slave.board-safe {
     pcm "hw:CARD=Generic,DEV=0"
     rate 44100
@@ -48,15 +25,45 @@ pcm_slave.board-safe {
     buffer_size 1024
 }
 
+pcm_slave.e30-osu {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 16
+    buffer_size 192
+}
 
-pcm.hw_e30 {
-    type hw
-    card E30
-    device 0
-    nonblock false
-    #rate 44100
-    #format S32_LE
-    #channels 2
+pcm_slave.e30-cs2 {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 128
+    buffer_size 384
+}
+
+pcm_slave.e30-safe {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 256
+    buffer_size 1024
+}
+
+pcm_slave.e30-synth {
+    pcm "hw:CARD=E30,DEV=0"
+    rate 44100
+    format S32_LE
+    channels 2
+    period_size 1024
+    buffer_size 8192
+}
+
+
+pcm.nullsink {
+    type null
 }
 
 pcm.hw_board {
@@ -69,21 +76,28 @@ pcm.hw_board {
     #channels 2
 }
 
-pcm.nullsink {
-    type null
-}
-
 pcm.osu {
     type dmix
     ipc_key 7272
     ipc_perm 0600
     slave board-osu
 }
+
 pcm.cs2 {
     type dmix
     ipc_key 6969
     ipc_perm 0600
     slave board-cs2
+}
+
+pcm.hw_e30 {
+    type hw
+    card E30
+    device 0
+    nonblock false
+    #rate 44100
+    #format S32_LE
+    #channels 2
 }
 
 pcm.osu-e30 {
@@ -92,11 +106,22 @@ pcm.osu-e30 {
     ipc_perm 0600
     slave e30-osu
 }
+
 pcm.cs2-e30 {
     type dmix
     ipc_key 9696
     ipc_perm 0600
     slave e30-cs2
+}
+
+pcm.synth-e30 {
+    type plug
+    slave.pcm {
+        type dmix
+        ipc_key 1212
+        ipc_perm 0600
+        slave e30-synth
+    }
 }
 
 
@@ -108,6 +133,7 @@ pcm.!default {
         default "nullsink"
     }
 }
+
 
 ctl.!default {
     type hw
