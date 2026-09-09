@@ -646,11 +646,20 @@ step_docker()
     apt install -y ca-certificates curl gnupg
     install -m 0755 -d /etc/apt/keyrings
 
-    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    chmod a+r /etc/apt/keyrings/docker.gpg
+    local keyring="/etc/apt/keyrings/docker.gpg"
+    local key_url="https://download.docker.com/linux/debian/gpg"
 
-    cat >/etc/apt/sources.list.d/docker.list <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $docker_codename stable
+    curl -fsSL "$key_url" | gpg --dearmor -o "$keyring"
+    chmod 0644 "$keyring"
+
+    rm -f /etc/apt/sources.list.d/docker.list
+    cat >/etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $docker_codename
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: $keyring
 EOF
 
     apt update
@@ -665,17 +674,22 @@ EOF
 step_vscodium()
 {
     apt install -y ca-certificates curl gnupg
+    install -m 0755 -d /etc/apt/keyrings
 
-    # Keyring
-    local keyring="/usr/share/keyrings/vscodium-archive-keyring.gpg"
+    local keyring="/etc/apt/keyrings/vscodium.gpg"
     local key_url="https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg"
 
     curl -fsSL "$key_url" | gpg --dearmor -o "$keyring"
     chmod 0644 "$keyring"
 
-    # Source list
-    cat >/etc/apt/sources.list.d/vscodium.list <<'EOF'
-deb [arch=amd64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main
+    rm -f /etc/apt/sources.list.d/vscodium.list
+    cat >/etc/apt/sources.list.d/vscodium.sources <<EOF
+Types: deb
+URIs: https://download.vscodium.com/debs
+Suites: vscodium
+Components: main
+Architectures: $(dpkg --print-architecture)
+Signed-By: $keyring
 EOF
 
     apt update
