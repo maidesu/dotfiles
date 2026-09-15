@@ -80,14 +80,11 @@ xsetwacom --set "Wacom One by Wacom S Pen eraser" Suppress 0 || true
 xsetwacom --set "Wacom One by Wacom S Pen stylus" RawSample 1 || true
 xsetwacom --set "Wacom One by Wacom S Pen eraser" RawSample 1 || true
 
-xsetwacom --set "Wacom One by Wacom S Pen stylus" Area 11096 7191 15200 9500 || true
-xsetwacom --set "Wacom One by Wacom S Pen eraser" Area 11096 7191 15200 9500 || true
+xsetwacom --set "Wacom One by Wacom S Pen stylus" Area 0 0 4104 2309 || true
+xsetwacom --set "Wacom One by Wacom S Pen eraser" Area 0 0 4104 2309 || true
 
 xsetwacom --set "Wacom One by Wacom S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom One by Wacom S Pen eraser" MapToOutput HEAD-0 || true
-
-xsetwacom --set "Wacom One by Wacom S Pen stylus" Rotate half || true
-xsetwacom --set "Wacom One by Wacom S Pen eraser" Rotate half || true
 
 log "applying gpu settings"
 nvidia-settings \

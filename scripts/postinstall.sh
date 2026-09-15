@@ -406,6 +406,10 @@ SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=
 # Wacom PTK-470
 SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", TAG+="uaccess"
 SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", TAG+="uaccess"
+
+# Wacom CTL-472
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="037a", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="037a", TAG+="uaccess"
 EOF
 
     udevadm control --reload-rules
@@ -425,6 +429,12 @@ SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=
 # Ignore the kernel mousedev compatibility streams. They duplicate the pen
 # event node and translate BTN_TOUCH into a mouse button.
 SUBSYSTEM=="input", KERNEL=="mouse*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_MOUSE}="0", ENV{ID_INPUT_JOYSTICK}="1"
+
+# Same treatment for the CTL-472. It has no pad, but the exclusion is kept so
+# both tablets match on the same condition.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="037a", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{ID_INPUT_MOUSE}="1", TAG+="uaccess"
+
+SUBSYSTEM=="input", KERNEL=="mouse*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="037a", ENV{ID_INPUT_MOUSE}="0", ENV{ID_INPUT_JOYSTICK}="1"
 EOF
 
     udevadm control --reload-rules
@@ -436,8 +446,12 @@ step_tablet_area_rule()
 {
     install -d -m 0755 /etc/udev/rules.d
     cat >/etc/udev/rules.d/72-tablet-area.rules <<'EOF'
-# Advertise an 8400x4725-unit area at 200 units/mm on the Wacom PTK-470 pen.
-ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:8400:200:0:0", ENV{EVDEV_ABS_01}="0:4725:200:0:0", RUN{builtin}+="keyboard"
+# Advertise an 8208x4617-unit area at 200 units/mm on the Wacom PTK-470 pen.
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="03f5", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:8208:200:0:0", ENV{EVDEV_ABS_01}="0:4617:200:0:0", RUN{builtin}+="keyboard"
+
+# Advertise a 4104x2309-unit area at 100 units/mm on the Wacom CTL-472 pen.
+# The HID-BPF clamp mirrors this tablet, so the window starts at the origin.
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="037a", ENV{ID_INPUT_TABLET}=="1", ENV{ID_INPUT_TABLET_PAD}!="1", ENV{EVDEV_ABS_00}="0:4104:100:0:0", ENV{EVDEV_ABS_01}="0:2309:100:0:0", RUN{builtin}+="keyboard"
 EOF
 
     udevadm control --reload-rules
@@ -1003,6 +1017,7 @@ main()
             step_appimages
             ;;
         kmsdrm)
+            step_peripheral_read_rules
             step_sdl_tablet_mouse_rule
             step_tablet_area_rule
 
