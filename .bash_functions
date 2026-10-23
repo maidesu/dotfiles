@@ -76,7 +76,7 @@ u()
     }
 
     run_update sudo apt update
-    run_update sudo apt full-upgrade --auto-remove
+    run_update sudo apt full-upgrade --auto-remove --purge
 
     command -v flatpak >/dev/null 2>&1 &&
         run_update sudo flatpak update
