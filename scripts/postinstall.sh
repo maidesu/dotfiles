@@ -604,7 +604,7 @@ eval "$(pyenv init -)"
 # Install requested Python versions (skip if already installed)
 available_versions="$(pyenv install --list | sed 's/^[[:space:]]*//')"
 
-for minor in 3.10 3.11 3.12 3.13 3.14; do
+for minor in 3.11 3.12 3.13 3.14; do
   latest="$(
     printf '%s\n' "$available_versions" \
       | grep -E "^${minor}\.[0-9]+$" \
