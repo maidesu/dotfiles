@@ -710,6 +710,39 @@ EOF
     apt install -y codium
 }
 
+step_gh()
+{
+    apt install -y ca-certificates curl
+    install -m 0755 -d /etc/apt/keyrings
+
+    local keyring="/etc/apt/keyrings/github-cli.gpg"
+    local key_url="https://cli.github.com/packages/githubcli-archive-keyring.gpg"
+
+    # Key is already in binary form, no dearmor needed
+    curl -fsSL "$key_url" -o "$keyring"
+    chmod 0644 "$keyring"
+
+    rm -f /etc/apt/sources.list.d/github-cli.list
+    cat >/etc/apt/sources.list.d/github-cli.sources <<EOF
+Types: deb
+URIs: https://cli.github.com/packages
+Suites: stable
+Components: main
+Architectures: $(dpkg --print-architecture)
+Signed-By: $keyring
+EOF
+
+    # Debian's gh lags far behind upstream; always prefer upstream's
+    cat >/etc/apt/preferences.d/github-cli <<EOF
+Package: gh
+Pin: origin cli.github.com
+Pin-Priority: 1001
+EOF
+
+    apt update
+    apt install -y gh
+}
+
 step_app_packages()
 {
     apt install -y \
@@ -957,6 +990,7 @@ main()
             step_docker
 
             step_vscodium
+            step_gh
 
             step_app_packages
             step_steam
@@ -1002,6 +1036,7 @@ main()
             step_docker
 
             step_vscodium
+            step_gh
 
             step_app_packages
             step_steam
