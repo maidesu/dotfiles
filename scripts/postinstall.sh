@@ -459,6 +459,33 @@ EOF
     udevadm settle
 }
 
+step_iodisk_os_rule()
+{
+    # Link /dev/iodisk-os to the disk holding /, for the disk_iostats block.
+    # The serial is looked up here so it only ever lives in /etc/udev.
+    local root_source disk serial
+
+    root_source="$(findmnt -nvo SOURCE /)"
+    disk="$(lsblk -lnso NAME,TYPE "$root_source" | awk '$2 == "disk" { print $1 }')"
+    [[ -n "$disk" && "$disk" != *$'\n'* ]] || die "Expected one disk under $root_source, got: ${disk:-none}"
+
+    serial="$(udevadm info --query=property --property=ID_SERIAL --value --name="/dev/$disk")"
+    [[ -n "$serial" ]] || die "No ID_SERIAL for /dev/$disk"
+
+    install -d -m 0755 /etc/udev/rules.d
+    # Must sort after 60-persistent-storage.rules, which sets ID_SERIAL.
+    cat >/etc/udev/rules.d/61-iodisk-os.rules <<EOF
+SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", ENV{ID_SERIAL}=="$serial", SYMLINK+="iodisk-os"
+EOF
+
+    udevadm control --reload-rules
+    udevadm trigger --action=change --subsystem-match=block --sysname-match="$disk"
+    udevadm settle
+
+    [[ "$(readlink /dev/iodisk-os)" == "$disk" ]] || die "/dev/iodisk-os does not point to $disk"
+    echo "/dev/iodisk-os -> $disk"
+}
+
 step_swapfile()
 {
     local swapfile="/swapfile"
@@ -981,6 +1008,8 @@ main()
             step_skip_grub
             step_preempt_full
 
+            step_iodisk_os_rule
+
             step_nvidia_driver
             step_mok_pub
 
@@ -1026,6 +1055,7 @@ main()
             step_peripheral_read_rules
             step_sdl_tablet_mouse_rule
             step_tablet_area_rule
+            step_iodisk_os_rule
 
             step_nvidia_driver
             step_mok_pub

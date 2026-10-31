@@ -65,6 +65,13 @@ interval = 5
 format = "GPU: $utilization.eng(w:3,u:%) $memory.eng(w:5,u:B,p:Mi)"
 
 [[block]]
+block = "disk_iostats"
+device = "iodisk-os"
+interval = 10
+format = "I/O: R $speed_read.eng(w:5,u:B,p:Ki) W $speed_write.eng(w:5,u:B,p:Ki)"
+missing_format = ""
+
+[[block]]
 block = "disk_space"
 interval = 20
 path = "/"
