@@ -31,7 +31,7 @@ format = "BT: $text.str(width:4)"
 block = "net"
 device = "^(wl|wlan|wlp|wlo)"
 interval = 5
-format = "WiFi: $ssid.str(max_w:12) $signal_strength.eng(w:3,u:%) $speed_down.eng(w:5,u:b,p:K)↓ $speed_up.eng(w:5,u:b,p:K)↑"
+format = "WiFi: $ssid.str(max_w:12) $signal_strength.eng(w:3,u:%) $speed_down.eng(w:5,u:b,p:k)↓ $speed_up.eng(w:5,u:b,p:k)↑"
 inactive_format = "WiFi: down"
 missing_format = ""
 
@@ -39,7 +39,7 @@ missing_format = ""
 block = "net"
 device = "^(en|eth)"
 interval = 10
-format = "Eth: $speed_down.eng(w:5,u:b,p:K)↓ $speed_up.eng(w:5,u:b,p:K)↑"
+format = "Eth: $speed_down.eng(w:5,u:b,p:k)↓ $speed_up.eng(w:5,u:b,p:k)↑"
 inactive_format = "Eth: down"
 missing_format = ""
 
