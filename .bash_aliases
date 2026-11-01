@@ -10,6 +10,7 @@ alias ll='ls -lahF'
 alias upd='sudo apt update && sudo apt full-upgrade --auto-remove'
 alias res='systemctl reboot'
 alias off='systemctl poweroff'
+alias idle='sleep 1; xset s activate; xset dpms force off'
 
 alias act='source .venv/bin/activate'
 alias qa='poetry run poe qa'
