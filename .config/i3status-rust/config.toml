@@ -46,7 +46,7 @@ missing_format = ""
 [[block]]
 block = "cpu"
 interval = 5
-format = "CPU: $barchart $utilization.eng(w:3,u:%)"
+format = "CPU: $frequency.eng(w:4,u:Hz) $barchart $utilization.eng(w:3,u:%)"
 
 [[block]]
 block = "load"
@@ -62,7 +62,7 @@ format_alt = "SWP: $swap_used.eng(w:4,u:B,p:Gi) / $swap_total.eng(w:4,u:B,p:Gi)"
 [[block]]
 block = "nvidia_gpu"
 interval = 5
-format = "GPU: $utilization.eng(w:3,u:%) $memory.eng(w:5,u:B,p:Mi)"
+format = "GPU: $clocks.eng(w:4,u:Hz) $utilization.eng(w:3,u:%) $memory.eng(w:5,u:B,p:Mi)"
 
 [[block]]
 block = "disk_iostats"
