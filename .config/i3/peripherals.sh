@@ -90,4 +90,8 @@ log "applying gpu settings"
 nvidia-settings --load-config-only || true
 
 log "applying wallpapers"
-feh --bg-fill --randomize "$HOME"/.local/share/backgrounds/* || true
+if [ -e "$HOME/.fehbg-off" ]; then
+    hsetroot -solid '#000000' 2>/dev/null || xsetroot -solid black || true
+else
+    feh --bg-fill --randomize "$HOME"/.local/share/backgrounds/* || true
+fi
