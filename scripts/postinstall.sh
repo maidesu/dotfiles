@@ -218,8 +218,8 @@ step_nvidia_driver()
 {
     apt install -y dkms mokutil
 
-    cat >/etc/modprobe.d/nvidia-kms.conf <<'EOF'
-options nvidia-drm modeset=1
+    cat >/etc/modprobe.d/nvidia-overlay-layers.conf <<'EOF'
+options nvidia-modeset enable_overlay_layers=N
 EOF
 
     apt install -y nvidia-open
@@ -291,6 +291,11 @@ EOF
 exec i3
 EOF
 chmod 0755 "$HOME/.xsession"
+
+cat >"$HOME/.xsessionrc" <<'"'"'EOF'"'"'
+export __GL_SYNC_DISPLAY_DEVICE=DP-4
+EOF
+chmod 0644 "$HOME/.xsessionrc"
 
 mkdir -p "$HOME/.local/bin"
 cat >"$HOME/.local/bin/lmenu" <<'"'"'EOF'"'"'

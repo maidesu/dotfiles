@@ -43,9 +43,9 @@ wait_xrandr_output HDMI-0 || true
 log "applying display layout"
 xrandr \
   --output DP-2 --mode 1920x1080 --rate 144 --pos -1920x0 --rotate normal \
-  --output DP-4 --primary --mode 1920x1080 --rate 279.86 --pos 0x0 --rotate normal \
-  --output DP-0 --mode 1920x1080 --rate 60 --pos 1920x0 --rotate normal \
-  --output HDMI-0 --mode 1360x768 --rate 60 --pos 560x-768 --rotate normal || true
+  --output DP-4 --primary --mode 1920x1080 --rate 720 --pos 0x0 --rotate normal \
+  --output DP-0 --mode 1920x1080 --rate 279.86 --pos 1920x0 --rotate normal \
+  --output HDMI-0 --mode 1920x1080 --rate 60 --pos 0x-1080 --rotate normal || true
 
 log "applying mouse settings"
 for mouse in "Logitech X2 SUPERSTRIKE" "Logitech PRO X2 SUPERSTRIKE"; do
@@ -87,10 +87,7 @@ xsetwacom --set "Wacom One by Wacom S Pen stylus" MapToOutput HEAD-0 || true
 xsetwacom --set "Wacom One by Wacom S Pen eraser" MapToOutput HEAD-0 || true
 
 log "applying gpu settings"
-nvidia-settings \
-  --assign SyncToVBlank=0 \
-  --assign AllowFlipping=1 \
-  --assign GPUPowerMizerMode=1
+nvidia-settings --load-config-only || true
 
 log "applying wallpapers"
 feh --bg-fill --randomize "$HOME"/.local/share/backgrounds/* || true
