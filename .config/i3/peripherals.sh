@@ -20,18 +20,25 @@ wait_xrandr_output() {
   log "wait_xrandr_output: $out ready after ${i} loops (~$((i * 50))ms)"
 }
 
+# wait until any of the named devices appears; print the first one found
 wait_xinput_device() {
-  name="$1"
   i=0
-  while ! xinput list --name-only 2>/dev/null | grep -Fxq "$name"; do
+  while :; do
+    names=$(xinput list --name-only 2>/dev/null)
+    for name in "$@"; do
+      if printf '%s\n' "$names" | grep -Fxq "$name"; then
+        log "wait_xinput_device: $name ready after ${i} loops (~$((i * 50))ms)" >&2
+        printf '%s\n' "$name"
+        return 0
+      fi
+    done
     if [ "$i" -ge 100 ]; then
-      log "wait_xinput_device: $name timed out after ${i} loops (~$((i * 50))ms)"
+      log "wait_xinput_device: none of [$*] after ${i} loops (~$((i * 50))ms)" >&2
       return 1
     fi
     i=$((i+1))
     sleep 0.05
   done
-  log "wait_xinput_device: $name ready after ${i} loops (~$((i * 50))ms)"
 }
 
 log "waiting for outputs"
@@ -48,14 +55,13 @@ xrandr \
   --output HDMI-0 --mode 1920x1080 --rate 60 --pos 0x-1080 --rotate normal || true
 
 log "applying mouse settings"
-for mouse in "Logitech X2 SUPERSTRIKE" "Logitech PRO X2 SUPERSTRIKE"; do
-  wait_xinput_device "$mouse" || true
+if mouse=$(wait_xinput_device "Logitech X2 SUPERSTRIKE" "Logitech PRO X2 SUPERSTRIKE"); then
   xinput set-prop "pointer:$mouse" "libinput Accel Profile Enabled" 0 1 0 || true
   xinput set-prop "pointer:$mouse" "libinput Accel Speed" 0 || true
-done
+fi
 
 log "applying wacom settings"
-wait_xinput_device "Wacom Intuos Pro S Pen stylus" || true
+wait_xinput_device "Wacom Intuos Pro S Pen stylus" >/dev/null || true
 
 xsetwacom --set "Wacom Intuos Pro S Pen stylus" Suppress 0 || true
 xsetwacom --set "Wacom Intuos Pro S Pen eraser" Suppress 0 || true
