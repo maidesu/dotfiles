@@ -908,7 +908,6 @@ else
     export SDL_VIDEO_DRIVER=kmsdrm
     export SDL_VIDEO_DISPLAY_PRIORITY=DP-3
     export SDL_KMSDRM_ATOMIC=0
-    export SDL_VIDEO_DOUBLE_BUFFER=1
 
     export SDL_PEN_MOUSE_EVENTS=0
 fi
