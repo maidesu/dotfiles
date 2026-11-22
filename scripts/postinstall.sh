@@ -395,6 +395,14 @@ GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT:+${GRUB_CMDLINE_LINUX_D
 EOF
 }
 
+step_console_720hz()
+{
+    install -d -m 0755 /etc/default/grub.d
+    cat >/etc/default/grub.d/03-console-720hz.cfg <<'EOF'
+GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT:+${GRUB_CMDLINE_LINUX_DEFAULT} }video=DP-3:1920x1080@720"
+EOF
+}
+
 step_peripheral_read_rules()
 {
     install -d -m 0755 /etc/udev/rules.d
@@ -1055,6 +1063,7 @@ main()
 
             step_skip_grub
             step_preempt_full
+            step_console_720hz
 
             step_peripheral_read_rules
             step_sdl_tablet_mouse_rule
@@ -1086,11 +1095,15 @@ main()
             step_appimages
             ;;
         kmsdrm)
+            step_console_720hz
+
             step_peripheral_read_rules
             step_sdl_tablet_mouse_rule
             step_tablet_area_rule
 
             step_gamemode
+
+            step_finalize
             ;;
         py)
             step_python
